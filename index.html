@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Billetera Telegram</title>
+  <script src="https://telegram.org"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--tg-theme-bg-color, #18181b);
+      color: var(--tg-theme-text-color, #ffffff);
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      padding: 24px;
+      border-radius: 16px;
+      color: white;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .card span { font-size: 14px; opacity: 0.9; }
+    .card h1 { font-size: 36px; margin: 8px 0 0 0; }
+    input, button {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+    input {
+      background-color: var(--tg-theme-secondary-bg-color, #27272a);
+      border: 1px solid #3f3f46;
+      color: inherit;
+    }
+    button {
+      background-color: var(--tg-theme-button-color, #3b82f6);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2 id="saludo">Hola, Usuario</h2>
+
+  <div class="card">
+    <span>Saldo Disponible</span>
+    <h1 id="saldo">$500.00</h1>
+  </div>
+
+  <input type="text" id="destinatario" placeholder="Usuario (@ejemplo) o dirección">
+  <input type="number" id="monto" step="0.01" placeholder="Monto a enviar ($)">
+  <button onclick="enviar()">Transferir Fondos</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Mostrar nombre del usuario de Telegram
+    const user = tg.initDataUnsafe?.user;
+    if (user) {
+      document.getElementById('saludo').innerText = `Hola, ${user.first_name}`;
+    }
+
+    let saldoActual = 500.00;
+
+    function enviar() {
+      const dest = document.getElementById('destinatario').value.trim();
+      const monto = parseFloat(document.getElementById('monto').value);
+
+      if (!dest || isNaN(monto) || monto <= 0) {
+        tg.showAlert('Ingresa un destinatario y un monto válido.');
+        return;
+      }
+      if (monto > saldoActual) {
+        tg.showAlert('Saldo insuficiente.');
+        return;
+      }
+
+      saldoActual -= monto;
+      document.getElementById('saldo').innerText = `$${saldoActual.toFixed(2)}`;
+      document.getElementById('destinatario').value = '';
+      document.getElementById('monto').value = '';
+      
+      tg.showAlert(`¡Enviaste $${monto.toFixed(2)} a ${dest}!`);
+    }
+  </script>
+</body>
+</html>
