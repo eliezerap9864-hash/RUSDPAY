@@ -1,113 +1,176 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>RUSDPAY</title>
-  <script src="https://telegram.org"></script>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>RUSDPAY WALLET</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#f5f7fa;font-family:Arial,sans-serif}
+header{padding:20px;background:#111c2e;border-bottom:1px solid #263449;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;font-weight:800;color:#f0b90b}
+.logo span{color:white}
+.status{font-size:11px;color:#f0b90b;border:1px solid #705c20;padding:6px 9px;border-radius:20px}
+main{max-width:900px;margin:auto;padding:20px}
+h2{font-size:19px;margin:25px 0 14px}
+p{color:#9eacc0;line-height:1.5}
+.balance{background:linear-gradient(135deg,#1b2b43,#243b5a);padding:25px;border-radius:18px;border:1px solid #354c69}
+.balance small{color:#bdc9d8}
+.amount{font-size:36px;font-weight:bold;margin:13px 0}
+.currency{color:#f0b90b;font-size:16px}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
+button{cursor:pointer;border:0;border-radius:11px;padding:13px 8px;font-weight:bold;background:#f0b90b;color:#101827}
+.action{background:#1d2b40;color:white;border:1px solid #35465e}
+.action span{display:block;font-size:21px;margin-bottom:7px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px}
+.card{background:#152237;border:1px solid #293b54;border-radius:14px;padding:17px}
+.card strong{display:block;font-size:17px;margin-bottom:7px}
+.card small{color:#9eacc0}
+nav{display:flex;gap:8px;overflow-x:auto;padding:16px 0}
+nav button{white-space:nowrap;background:#1d2b40;color:#c8d2df}
+nav button.active{background:#f0b90b;color:#101827}
+.panel{background:#152237;border:1px solid #293b54;padding:20px;border-radius:15px;margin-top:15px}
+input,select{width:100%;padding:13px;margin:8px 0 15px;border-radius:9px;border:1px solid #35465e;background:#0d1727;color:white;font-size:15px}
+label{font-size:13px;color:#bdc9d8}
+.primary{width:100%;margin-top:8px}
+.item{padding:14px 0;border-bottom:1px solid #293b54;display:flex;justify-content:space-between;gap:12px}
+.item:last-child{border:0}
+.muted{color:#9eacc0;font-size:12px}
+.green{color:#36c98f}
+.yellow{color:#f0b90b}
+footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
+.notice{background:#342d19;color:#f5d77a;border:1px solid #6c5a25;padding:12px;border-radius:10px;font-size:12px;line-height:1.5}
+.section{display:none}
+.section.show{display:block}
+</style>
 </head>
 <body>
-  <div class="top">
-    <div class="top-left">
-      <div class="logo">R</div>
-      <div><div class="title">RUSDPAY Wallet</div><div class="sub" id="uHello">Cargando...</div></div>
-    </div>
-    <button class="admin-badge" id="btnAdminNav" onclick="go('admin')">👑 ADMIN</button>
-  </div>
 
-  <!-- 1. INICIO -->
-  <div id="v-home" class="view show">
-    <div class="glass hero">
-      <span class="lbl">SALDO INTERNO DISPONIBLE</span>
-      <div class="grid2">
-        <div><span class="lbl">RUSD</span><div class="val-cyan" id="balRusd">0.00</div></div>
-        <div><span class="lbl">EQUIV. RUB</span><div class="val-purple" id="balRub">0</div></div>
-      </div>
-      <div class="rates-bar" id="ratesBar">Cargando tasas diarias...</div>
-    </div>
+<header>
+  <div class="logo">RUSD<span>PAY</span></div>
+  <div class="status">● MODO DEMO</div>
+</header>
 
-    <div class="grid2" style="margin-bottom:14px;">
-      <button class="btn-glow" onclick="go('send')">🚀 Enviar / Escanear</button>
-      <button class="btn-sec" style="margin:0;height:100%;" onclick="go('rec')">📥 QR Depósito</button>
-    </div>
+<main>
+  <h2>Hola, bienvenido a RUSDPAY</h2>
+  <p>Tu billetera digital para intercambiar y gestionar RUSD.</p>
 
-    <div class="glass">
-      <span class="lbl">HISTORIAL RECIENTE</span>
-      <div id="txList"><p style="color:#64748b;font-size:13px;">Sin movimientos</p></div>
+  <div class="balance">
+    <small>Saldo disponible</small>
+    <div class="amount"><span id="balance">0.00</span> <span class="currency">RUSD</span></div>
+    <small>Saldo de demostración</small>
+    <div class="actions">
+      <button class="action" onclick="openSection('send')"><span>↗</span>Enviar</button>
+      <button class="action" onclick="openSection('receive')"><span>↙</span>Recibir</button>
+      <button class="action" onclick="openSection('exchange')"><span>⇄</span>Cambiar</button>
+      <button class="action" onclick="openSection('p2p')"><span>⇆</span>P2P</button>
     </div>
   </div>
 
-  <!-- 2. ENVIAR + ESCÁNER QR -->
-  <div id="v-send" class="view">
-    <div class="glass">
-      <span class="lbl">TRANSFERENCIA INSTANTÁNEA (0% COMISIÓN)</span>
-      <button class="btn-sec" onclick="scanQR()">📷 Escanear Código QR de Usuario</button>
-      <input type="text" id="destUser" placeholder="Usuario (@ejemplo) o ID de Telegram">
-      <input type="number" id="sendAmt" step="0.01" placeholder="Monto en RUSD">
-      <button class="btn-glow" id="btnSend" onclick="sendInternal()">Enviar Saldo Interno</button>
-    </div>
-  </div>
+  <nav>
+    <button class="active" data-tab="home" onclick="showTab('home',this)">Inicio</button>
+    <button data-tab="exchange" onclick="showTab('exchange',this)">Cambio</button>
+    <button data-tab="p2p" onclick="showTab('p2p',this)">P2P</button>
+    <button data-tab="history" onclick="showTab('history',this)">Historial</button>
+  </nav>
 
-  <!-- 3. QR DEPÓSITO + COMPRAR / VENDER (RETIRO) -->
-  <div id="v-rec" class="view">
-    <div class="glass" style="text-align:center;">
-      <span class="lbl">TU QR PARA RECIBIR SALDO INTERNO</span>
-      <img id="qrImg" width="150" height="150" style="background:#fff;padding:8px;border-radius:14px;margin:10px 0;">
-      <button class="btn-sec" onclick="copyMe()">Copiar mi @usuario / ID</button>
+  <section id="home" class="section show">
+    <h2>Operaciones</h2>
+    <div class="cards">
+      <div class="card"><strong>Comprar RUSD</strong><small>Con tus métodos de pago</small></div>
+      <div class="card"><strong>Vender RUSD</strong><small>Solicita un intercambio</small></div>
+      <div class="card"><strong>Transferencias</strong><small>Entre usuarios</small></div>
     </div>
+    <h2>Monedas disponibles</h2>
+    <div class="cards">
+      <div class="card"><strong>RUB</strong><small>Rublo ruso</small></div>
+      <div class="card"><strong>USD</strong><small>Dólar estadounidense</small></div>
+      <div class="card"><strong>USDT</strong><small>Tether</small></div>
+      <div class="card"><strong>CUP</strong><small>Peso cubano</small></div>
+      <div class="card"><strong>BRL</strong><small>Real brasileño</small></div>
+    </div>
+    <p class="muted">Estas monedas son métodos de intercambio. El único saldo de la billetera es RUSD.</p>
+  </section>
 
-    <div class="glass">
-      <div class="tabs">
-        <button class="tab-btn active" id="tBuy" onclick="setOp('DEPOSITO')">Comprar RUSD</button>
-        <button class="tab-btn" id="tSell" onclick="setOp('RETIRO')">Vender / Retirar</button>
-      </div>
-      <select id="opCurr" onchange="calcOp()">
-        <option value="RUB">RUB (Rublos - SBP)</option>
-        <option value="CUP">CUP (Transfermóvil)</option>
-        <option value="USDT">USDT (TRC20 / TON)</option>
+  <section id="exchange" class="section">
+    <h2>Cambiar monedas</h2>
+    <div class="panel">
+      <label>Quiero cambiar desde</label>
+      <select id="from">
+        <option>USD</option><option>RUB</option><option>USDT</option><option>CUP</option><option>BRL</option>
       </select>
-      <input type="number" id="opAmt" oninput="calcOp()" placeholder="Cantidad en RUSD">
-      <div id="opCalc" style="font-size:13px;color:#38bdf8;margin-bottom:10px;font-weight:bold;">Total a pagar/recibir: 0</div>
-      <input type="text" id="opRef" placeholder="Tu tarjeta/wallet o ID de comprobante">
-      <button class="btn-glow" onclick="createOrder()">Enviar Solicitud al Admin</button>
+      <label>Cantidad</label>
+      <input id="amount" type="number" min="0" placeholder="Introduce una cantidad">
+      <label>Quiero recibir</label>
+      <input value="RUSD" disabled>
+      <div class="notice">Las tasas oficiales serán configuradas por la administración. Esta demostración no calcula tasas reales ni ejecuta cambios.</div>
+      <button class="primary" onclick="demoMessage()">Simular solicitud</button>
     </div>
-  </div>
+  </section>
 
-  <!-- 4. MERCADO P2P (RUB <-> CRIPTO / RUSD) -->
-  <div id="v-p2p" class="view">
-    <div class="glass">
-      <span class="lbl">PUBLICAR ANUNCIO P2P (RUB ↔ CRIPTO)</span>
-      <div class="grid2">
-        <select id="p2pType"><option value="VENDO RUB">Vendo RUB</option><option value="COMPRO RUB">Compro RUB</option></select>
-        <select id="p2pAsset"><option value="USDT">Por USDT</option><option value="TON">Por TON</option><option value="RUSD">Por RUSD</option></select>
-      </div>
-      <div class="grid2">
-        <input type="number" id="p2pAmt" placeholder="Monto">
-        <input type="number" id="p2pPrice" placeholder="Tasa (RUB)">
-      </div>
-      <button class="btn-glow" onclick="postP2P()">Publicar Oferta P2P</button>
+  <section id="p2p" class="section">
+    <h2>Mercado P2P</h2>
+    <div class="panel">
+      <strong>Compra y venta entre usuarios</strong>
+      <p>Encuentra ofertas para comprar o vender RUSD directamente con otros usuarios.</p>
+      <div class="notice">La protección escrow y la revisión de disputas se implementarán en el backend seguro. Todavía no se bloquea ni se libera dinero real.</div>
+      <button class="primary" onclick="demoMessage()">Ver ofertas (próximamente)</button>
     </div>
-    <div class="glass">
-      <span class="lbl">OFERTAS ACTIVAS EN EL MERCADO</span>
-      <div id="p2pList">Cargando ofertas...</div>
-    </div>
-  </div>
+  </section>
 
-  <!-- 5. PANEL ADMIN (SOLO @eliezerap98) -->
-  <div id="v-admin" class="view">
-    <div class="glass" style="border-color:#ef4444;">
-      <span class="lbl" style="color:#fca5a5;">SOLICITUDES PENDIENTES DE APROBACIÓN</span>
-      <div id="adminOrders">Cargando...</div>
+  <section id="history" class="section">
+    <h2>Historial de movimientos</h2>
+    <div class="panel" id="historyList">
+      <p>No hay movimientos todavía.</p>
     </div>
-  </div>
+  </section>
 
-  <div class="nav">
-    <div class="nav-item active" id="n-home" onclick="go('home')">🛡️<br>Inicio</div>
-    <div class="nav-item" id="n-send" onclick="go('send')">📷<br>Enviar/QR</div>
-    <div class="nav-item" id="n-rec" onclick="go('rec')">💳<br>Comprar/Vender</div>
-    <div class="nav-item" id="n-p2p" onclick="go('p2p')">🤝<br>P2P</div>
-  </div>
-  <script src="app.js"></script>
+  <section id="send" class="section">
+    <h2>Enviar RUSD</h2>
+    <div class="panel">
+      <label>Usuario destinatario</label>
+      <input placeholder="@usuario de Telegram">
+      <label>Cantidad en RUSD</label>
+      <input type="number" min="0" placeholder="0.00">
+      <div class="notice">Las transferencias reales todavía no están habilitadas.</div>
+      <button class="primary" onclick="demoMessage()">Continuar</button>
+    </div>
+  </section>
+
+  <section id="receive" class="section">
+    <h2>Recibir RUSD</h2>
+    <div class="panel">
+      <p>Tu usuario de Telegram permitirá identificar tu cuenta cuando conectemos el bot.</p>
+      <div class="notice">La recepción de fondos se habilitará después de configurar el backend seguro.</div>
+      <button class="primary" onclick="demoMessage()">Entendido</button>
+    </div>
+  </section>
+
+  <footer>
+    RUSDPAY WALLET © 2026<br>
+    Plataforma en desarrollo · Modo demostración
+  </footer>
+</main>
+
+<script>
+function showTab(id,button){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  if(button) button.classList.add('active');
+}
+function openSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  document.querySelectorAll('nav button').forEach(b=>{
+    b.classList.toggle('active',b.dataset.tab===id);
+  });
+}
+function demoMessage(){
+  alert('RUSDPAY: Esta función estará disponible cuando conectemos el backend seguro. Esta versión es solo una demostración.');
+}
+</script>
 </body>
 </html>
