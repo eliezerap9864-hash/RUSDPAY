@@ -9,46 +9,45 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#0b1220;color:#f5f7fa;font-family:Arial,sans-serif}
-header{padding:20px;background:#111c2e;border-bottom:1px solid #263449;display:flex;justify-content:space-between;align-items:center}
+header{padding:18px;background:#111c2e;border-bottom:1px solid #263449;display:flex;justify-content:space-between;align-items:center}
 .logo{font-size:22px;font-weight:800;color:#f0b90b}
 .logo span{color:white}
-.status{font-size:11px;color:#f0b90b;border:1px solid #705c20;padding:6px 9px;border-radius:20px}
-main{max-width:900px;margin:auto;padding:20px}
-h2{font-size:19px;margin:25px 0 14px}
+.status{font-size:10px;color:#f0b90b;border:1px solid #705c20;padding:6px 9px;border-radius:20px}
+main{max-width:950px;margin:auto;padding:16px}
+h2{font-size:19px;margin:24px 0 14px}
+h3{font-size:16px}
 p{color:#9eacc0;line-height:1.5}
-.balance{background:linear-gradient(135deg,#1b2b43,#243b5a);padding:25px;border-radius:18px;border:1px solid #354c69}
+.balance{background:linear-gradient(135deg,#1b2b43,#243b5a);padding:23px;border-radius:18px;border:1px solid #354c69}
 .balance small{color:#bdc9d8}
-.amount{font-size:36px;font-weight:bold;margin:13px 0}
+.amount{font-size:35px;font-weight:bold;margin:13px 0}
 .currency{color:#f0b90b;font-size:16px}
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
-button{cursor:pointer;border:0;border-radius:11px;padding:13px 8px;font-weight:bold;background:#f0b90b;color:#101827}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px}
+button{cursor:pointer;border:0;border-radius:10px;padding:12px 9px;font-weight:bold;background:#f0b90b;color:#101827}
 .action{background:#1d2b40;color:white;border:1px solid #35465e}
-.action span{display:block;font-size:21px;margin-bottom:7px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px}
-.card{background:#152237;border:1px solid #293b54;border-radius:14px;padding:17px}
-.card strong{display:block;font-size:17px;margin-bottom:7px}
-.card small{color:#9eacc0}
+.action span{display:block;font-size:21px;margin-bottom:6px}
 nav{display:flex;gap:8px;overflow-x:auto;padding:16px 0}
 nav button{white-space:nowrap;background:#1d2b40;color:#c8d2df}
 nav button.active{background:#f0b90b;color:#101827}
-.panel{background:#152237;border:1px solid #293b54;padding:20px;border-radius:15px;margin-top:15px}
-input,select{width:100%;padding:13px;margin:8px 0 15px;border-radius:9px;border:1px solid #35465e;background:#0d1727;color:white;font-size:15px}
-label{font-size:13px;color:#bdc9d8}
-.primary{width:100%;margin-top:8px}
-.item{padding:14px 0;border-bottom:1px solid #293b54;display:flex;justify-content:space-between;gap:12px}
-.item:last-child{border:0}
-.muted{color:#9eacc0;font-size:12px}
-.green{color:#36c98f}
-.yellow{color:#f0b90b}
-footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
-.notice{background:#342d19;color:#f5d77a;border:1px solid #6c5a25;padding:12px;border-radius:10px;font-size:12px;line-height:1.5}
 .section{display:none}
 .section.show{display:block}
+.panel,.card{background:#152237;border:1px solid #293b54;border-radius:14px;padding:18px;margin-top:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:11px}
+.card strong{display:block;margin-bottom:7px}
+.card small,.muted{color:#9eacc0;font-size:12px}
+label{display:block;font-size:13px;color:#bdc9d8;margin-top:12px}
+input,select{width:100%;padding:13px;margin:7px 0 12px;border-radius:9px;border:1px solid #35465e;background:#0d1727;color:white;font-size:15px}
+input:disabled{opacity:.7}
+.primary{width:100%;margin-top:8px}
+.notice{background:#342d19;color:#f5d77a;border:1px solid #6c5a25;padding:12px;border-radius:10px;font-size:12px;line-height:1.5;margin:12px 0}
+.rowline{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #293b54}
+.rowline:last-child{border:0}
+.yellow{color:#f0b90b}
+footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
 @media(max-width:450px){
- main{padding:14px}
- .actions{gap:6px}
- .action{font-size:11px;padding:12px 4px}
- .amount{font-size:30px}
+ main{padding:13px}
+ .actions{gap:5px}
+ .action{font-size:11px;padding:11px 3px}
+ .amount{font-size:29px}
 }
 </style>
 </head>
@@ -65,7 +64,7 @@ footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
 
   <div class="balance">
     <small>Saldo disponible</small>
-    <div class="amount"><span id="balance">0.00</span> <span class="currency">RUSD</span></div>
+    <div class="amount">0.00 <span class="currency">RUSD</span></div>
     <small>Saldo de demostración</small>
     <div class="actions">
       <button class="action" onclick="openSection('send')"><span>↗</span>Enviar</button>
@@ -80,6 +79,7 @@ footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
     <button data-tab="exchange" onclick="showTab('exchange',this)">Cambio</button>
     <button data-tab="p2p" onclick="showTab('p2p',this)">P2P</button>
     <button data-tab="history" onclick="showTab('history',this)">Historial</button>
+    <button data-tab="admin" onclick="showTab('admin',this)">Administración</button>
   </nav>
 
   <section id="home" class="section show">
@@ -89,15 +89,16 @@ footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
       <div class="card"><strong>Vender RUSD</strong><small>Solicita un intercambio</small></div>
       <div class="card"><strong>Transferencias</strong><small>Entre usuarios</small></div>
     </div>
+
     <h2>Monedas disponibles</h2>
     <div class="cards">
-      <div class="card"><strong>RUB</strong><small>Rublo ruso</small></div>
       <div class="card"><strong>USD</strong><small>Dólar estadounidense</small></div>
       <div class="card"><strong>USDT</strong><small>Tether</small></div>
-      <div class="card"><strong>CUP</strong><small>Peso cubano</small></div>
+      <div class="card"><strong>RUB</strong><small>Rublo ruso</small></div>
       <div class="card"><strong>BRL</strong><small>Real brasileño</small></div>
+      <div class="card"><strong>CUP</strong><small>Peso cubano</small></div>
     </div>
-    <p class="muted">Estas monedas son métodos de intercambio. El único saldo de la billetera es RUSD.</p>
+    <p class="muted">El único saldo de la billetera es RUSD. Las demás monedas son métodos de intercambio.</p>
   </section>
 
   <section id="exchange" class="section">
@@ -109,8 +110,8 @@ footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
         <option value="from">Convertir desde RUSD</option>
       </select>
 
-      <label id="fromLabel">Quiero cambiar desde</label>
-      <select id="currency">
+      <label id="fromLabel">Moneda que entregas</label>
+      <select id="currency" onchange="calculateExchange()">
         <option>USD</option>
         <option>USDT</option>
         <option>RUB</option>
@@ -118,33 +119,41 @@ footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
         <option>CUP</option>
       </select>
 
-      <label>Cantidad</label>
-      <input id="amount" type="number" min="0" placeholder="Introduce una cantidad">
+      <label>Cantidad que entregas</label>
+      <input id="exchangeAmount" type="number" min="0" step="any" placeholder="Introduce una cantidad" oninput="calculateExchange()">
 
-      <label id="toLabel">Quiero recibir</label>
+      <label>Moneda que recibirás</label>
       <input id="resultCurrency" value="RUSD" disabled>
 
-      <div class="notice">
-        Puedes seleccionar cualquiera de las dos direcciones. Las tasas oficiales serán configuradas por la administración. Esta demostración no calcula tasas reales ni ejecuta cambios.
+      <label>Resultado estimado</label>
+      <input id="exchangeResult" placeholder="Configura primero una tasa" disabled>
+
+      <div id="exchangeRateInfo" class="notice">
+        Las tasas todavía no están configuradas.
       </div>
-      <button class="primary" onclick="demoMessage()">Simular solicitud</button>
+      <button class="primary" onclick="demoMessage()">Solicitar cambio</button>
     </div>
   </section>
 
   <section id="p2p" class="section">
     <h2>Mercado P2P</h2>
     <div class="panel">
-      <strong>Compra y venta entre usuarios</strong>
+      <h3>Compra y venta entre usuarios</h3>
       <p>Encuentra ofertas para comprar o vender RUSD directamente con otros usuarios.</p>
       <div class="notice">La protección escrow y la revisión de disputas se implementarán en el backend seguro. Todavía no se bloquea ni se libera dinero real.</div>
       <button class="primary" onclick="demoMessage()">Ver ofertas (próximamente)</button>
+    </div>
+    <div class="panel">
+      <h3>Protección de operaciones</h3>
+      <p>El sistema definitivo bloqueará temporalmente el RUSD del vendedor y solo lo liberará tras confirmar la recepción del pago. Las disputas serán revisadas por administración.</p>
     </div>
   </section>
 
   <section id="history" class="section">
     <h2>Historial de movimientos</h2>
-    <div class="panel" id="historyList">
+    <div class="panel">
       <p>No hay movimientos todavía.</p>
+      <p class="muted">El historial real se conectará a Firebase.</p>
     </div>
   </section>
 
@@ -169,6 +178,79 @@ footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
     </div>
   </section>
 
+  <section id="admin" class="section">
+    <h2>Panel de Administración</h2>
+
+    <div class="notice">
+      PANEL DE DEMOSTRACIÓN: todavía no es privado. Cualquier persona que abra la página puede verlo. No introduzcas contraseñas ni datos secretos. La protección real se conectará mediante Firebase Authentication y permisos del servidor.
+    </div>
+
+    <div class="cards">
+      <div class="card"><small>Monedas configurables</small><strong>5 monedas</strong></div>
+      <div class="card"><small>Comisión general</small><strong id="commissionSummary">0%</strong></div>
+      <div class="card"><small>Estado del panel</small><strong class="yellow">Demostración</strong></div>
+    </div>
+
+    <h2>Tasas de cambio</h2>
+    <div class="panel">
+      <p>Indica cuántas unidades de cada moneda equivalen a 1 RUSD. No se presupone ninguna paridad ni tasa. Los valores que introduzcas aquí solo se guardan temporalmente en esta página.</p>
+
+      <label>1 RUSD equivale a cuántos USD</label>
+      <input id="rateUSD" type="number" min="0" step="any" placeholder="Tasa USD">
+
+      <label>1 RUSD equivale a cuántos USDT</label>
+      <input id="rateUSDT" type="number" min="0" step="any" placeholder="Tasa USDT">
+
+      <label>1 RUSD equivale a cuántos RUB</label>
+      <input id="rateRUB" type="number" min="0" step="any" placeholder="Tasa RUB">
+
+      <label>1 RUSD equivale a cuántos BRL</label>
+      <input id="rateBRL" type="number" min="0" step="any" placeholder="Tasa BRL">
+
+      <label>1 RUSD equivale a cuántos CUP</label>
+      <input id="rateCUP" type="number" min="0" step="any" placeholder="Tasa CUP">
+
+      <button class="primary" onclick="saveRates()">Guardar tasas de demostración</button>
+      <p id="rateMessage" class="muted"></p>
+    </div>
+
+    <h2>Comisiones</h2>
+    <div class="panel">
+      <label>Comisión general (%)</label>
+      <input id="commission" type="number" min="0" max="100" step="0.01" value="0">
+      <button class="primary" onclick="saveCommission()">Guardar comisión de demostración</button>
+      <p id="commissionMessage" class="muted"></p>
+    </div>
+
+    <h2>Límites de cambio</h2>
+    <div class="panel">
+      <label>Mínimo por operación (RUSD)</label>
+      <input id="minLimit" type="number" min="0" step="any" value="0">
+
+      <label>Máximo por operación (RUSD)</label>
+      <input id="maxLimit" type="number" min="0" step="any" placeholder="Sin límite configurado">
+
+      <button class="primary" onclick="saveLimits()">Guardar límites de demostración</button>
+      <p id="limitMessage" class="muted"></p>
+    </div>
+
+    <h2>Gestión de usuarios</h2>
+    <div class="panel">
+      <p>Esta sección permitirá consultar usuarios y actividad cuando conectemos la base de datos.</p>
+      <div class="rowline"><span>Usuarios registrados</span><strong>Próximamente</strong></div>
+      <div class="rowline"><span>Cuentas verificadas</span><strong>Próximamente</strong></div>
+      <div class="rowline"><span>Actividad</span><strong>Próximamente</strong></div>
+    </div>
+
+    <h2>Supervisión P2P y disputas</h2>
+    <div class="panel">
+      <div class="rowline"><span>Operaciones P2P</span><strong>Próximamente</strong></div>
+      <div class="rowline"><span>Operaciones en escrow</span><strong>Próximamente</strong></div>
+      <div class="rowline"><span>Disputas pendientes</span><strong>Próximamente</strong></div>
+      <p class="muted">La revisión y resolución de disputas requerirá registros seguros del servidor.</p>
+    </div>
+  </section>
+
   <footer>
     RUSDPAY WALLET © 2026<br>
     Plataforma en desarrollo · Modo demostración
@@ -176,42 +258,162 @@ footer{text-align:center;padding:30px 10px;color:#75849a;font-size:12px}
 </main>
 
 <script>
+const rates = {
+  USD:null,
+  USDT:null,
+  RUB:null,
+  BRL:null,
+  CUP:null
+};
+
+let commission = 0;
+let minLimit = 0;
+let maxLimit = null;
+
 function showTab(id,button){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.section').forEach(section=>{
+    section.classList.remove('show');
+  });
   document.getElementById(id).classList.add('show');
-  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+
+  document.querySelectorAll('nav button').forEach(btn=>{
+    btn.classList.remove('active');
+  });
+
   if(button) button.classList.add('active');
 }
 
 function openSection(id){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
+  document.querySelectorAll('.section').forEach(section=>{
+    section.classList.remove('show');
+  });
   document.getElementById(id).classList.add('show');
-  document.querySelectorAll('nav button').forEach(b=>{
-    b.classList.toggle('active',b.dataset.tab===id);
+
+  document.querySelectorAll('nav button').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.tab===id);
   });
 }
 
 function updateExchange(){
   const direction=document.getElementById('direction').value;
-  const currency=document.getElementById('currency');
+  const currency=document.getElementById('currency').value;
   const fromLabel=document.getElementById('fromLabel');
-  const toLabel=document.getElementById('toLabel');
-  const result=document.getElementById('resultCurrency');
+  const resultCurrency=document.getElementById('resultCurrency');
 
   if(direction==='to'){
-    fromLabel.textContent='Quiero cambiar desde';
-    toLabel.textContent='Quiero recibir';
-    result.value='RUSD';
+    fromLabel.textContent='Moneda que entregas';
+    resultCurrency.value='RUSD';
   }else{
-    fromLabel.textContent='Quiero cambiar desde RUSD';
-    toLabel.textContent='Quiero recibir';
-    result.value=currency.value;
+    fromLabel.textContent='Moneda que recibirás';
+    resultCurrency.value=currency;
   }
+
+  calculateExchange();
 }
 
-document.getElementById('currency').addEventListener('change',function(){
-  updateExchange();
-});
+function calculateExchange(){
+  const direction=document.getElementById('direction').value;
+  const currency=document.getElementById('currency').value;
+  const amount=Number(document.getElementById('exchangeAmount').value);
+  const result=document.getElementById('exchangeResult');
+  const info=document.getElementById('exchangeRateInfo');
+
+  document.getElementById('resultCurrency').value=
+    direction==='to'?'RUSD':currency;
+
+  if(!Number.isFinite(amount)||amount<=0){
+    result.value='';
+    info.textContent='Introduce una cantidad para calcular el resultado estimado.';
+    return;
+  }
+
+  const rate=rates[currency];
+
+  if(rate===null||rate<=0){
+    result.value='';
+    info.textContent='No hay una tasa configurada para '+currency+'. Puedes establecerla en Administración.';
+    return;
+  }
+
+  let converted;
+
+  if(direction==='to'){
+    converted=amount/rate;
+    info.textContent='Tasa de demostración: 1 RUSD = '+rate+' '+currency+'.';
+  }else{
+    converted=amount*rate;
+    info.textContent='Tasa de demostración: 1 RUSD = '+rate+' '+currency+'.';
+  }
+
+  result.value=converted.toFixed(4);
+}
+
+function saveRates(){
+  const currencies=['USD','USDT','RUB','BRL','CUP'];
+
+  for(const currency of currencies){
+    const value=document.getElementById('rate'+currency).value;
+    const number=Number(value);
+
+    if(value.trim()===''||!Number.isFinite(number)||number<=0){
+      alert('Introduce una tasa válida y mayor que cero para '+currency+'.');
+      return;
+    }
+  }
+
+  currencies.forEach(currency=>{
+    rates[currency]=Number(document.getElementById('rate'+currency).value);
+  });
+
+  document.getElementById('rateMessage').textContent=
+    'Tasas actualizadas en esta demostración. No se han guardado en el servidor.';
+
+  calculateExchange();
+}
+
+function saveCommission(){
+  const value=Number(document.getElementById('commission').value);
+
+  if(!Number.isFinite(value)||value<0||value>100){
+    alert('La comisión debe estar entre 0 y 100%.');
+    return;
+  }
+
+  commission=value;
+  document.getElementById('commissionSummary').textContent=commission+'%';
+  document.getElementById('commissionMessage').textContent=
+    'Comisión actualizada en esta demostración.';
+}
+
+function saveLimits(){
+  const minValue=document.getElementById('minLimit').value;
+  const maxValue=document.getElementById('maxLimit').value;
+
+  const min=Number(minValue);
+  const max=maxValue===''?null:Number(maxValue);
+
+  if(minValue===''||!Number.isFinite(min)||min<0){
+    alert('Introduce un límite mínimo válido.');
+    return;
+  }
+
+  if(max!==null&&(!Number.isFinite(max)||max<=0)){
+    alert('Introduce un límite máximo válido o déjalo vacío.');
+    return;
+  }
+
+  if(max!==null&&max<min){
+    alert('El límite máximo no puede ser menor que el mínimo.');
+    return;
+  }
+
+  minLimit=min;
+  maxLimit=max;
+
+  document.getElementById('limitMessage').textContent=
+    'Límites actualizados en esta demostración. Mínimo: '+minLimit+
+    ' RUSD. Máximo: '+(maxLimit===null?'sin configurar':maxLimit+' RUSD')+'.';
+}
 
 function demoMessage(){
   alert('RUSDPAY: Esta función estará disponible cuando conectemos el backend seguro. Esta versión es solo una demostración.');
