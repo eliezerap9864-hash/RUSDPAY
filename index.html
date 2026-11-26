@@ -54,70 +54,117 @@
     <button class="btn-primary" onclick="copyAddress()">Copiar mi ID / Usuario</button>
   </div>
   <h4 style="margin-bottom:8px; color:#374151;">Últimos Movimientos</h4>
-  <div id="txList" class="tx-container"><p style="padding:16px 0; color:#6b7280; text-align:center;">Conectando...</p></div>
-  <script>
-    const URL = 'https://supabase.co';
-    const KEY = 'sb_publishable_orHEYU_1dOe8zBwaiunzRQ_3F2STA2n';
-    const H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+  <div id="txList" class="tx-container"><p style="padding:16px 0; color:#6b7280; text-align:center;">Cargando...</p></div>
+
+  <script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, addDoc, runTransaction } from "https://gstatic.com";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_XLGqJHsHCWX-jJsWGplDkbLu6GGD3KU",
+      authDomain: "rusdpay.firebaseapp.com",
+      projectId: "rusdpay",
+      storageBucket: "rusdpay.firebasestorage.app",
+      messagingSenderId: "519480317804",
+      appId: "1:519480317804:web:55872c0371e022991ac549"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#f4f6f9'); tg.setBackgroundColor('#f4f6f9'); } catch(e) {} }
+
     const u = tg?.initDataUnsafe?.user || { id: 123456789, first_name: 'Usuario Demo', username: 'demo' };
-    const myId = String(u.id), myUser = u.username || '';
+    const myId = String(u.id), myUser = (u.username || '').toLowerCase();
     document.getElementById('userName').innerText = u.first_name;
     document.getElementById('userIdBadge').innerText = 'ID: ' + myId;
     document.getElementById('userHandle').innerText = myUser ? '@' + myUser : 'ID: ' + myId;
     document.getElementById('qrImage').src = 'https://qrserver.com' + (myUser || myId);
+
     async function init() {
       try {
-        const r = await fetch(`${URL}/rest/v1/wallets?tg_id=eq.${myId}&select=*`, { headers: H });
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const rows = await r.json();
-        let w = rows;
-        if (!w) {
-          const cr = await fetch(`${URL}/rest/v1/wallets`, { method: 'POST', headers: H, body: JSON.stringify({ tg_id: myId, username: myUser, first_name: u.first_name, balance: 100.00 }) });
-          if (!cr.ok) throw new Error('Crear: ' + cr.status);
-          const created = await cr.json();
-          w = created;
-        } else if (w.username !== myUser) {
-          await fetch(`${URL}/rest/v1/wallets?tg_id=eq.${myId}`, { method: 'PATCH', headers: H, body: JSON.stringify({ username: myUser }) });
+        const ref = doc(db, "wallets", myId);
+        const snap = await getDoc(ref);
+        let bal = 100.00;
+        if (!snap.exists()) {
+          await setDoc(ref, { tg_id: myId, username: myUser, first_name: u.first_name, balance: 100.00 });
+        } else {
+          bal = snap.data().balance;
+          if (snap.data().username !== myUser) await updateDoc(ref, { username: myUser });
         }
-        if (w) document.getElementById('balance').innerText = '$' + parseFloat(w.balance).toFixed(2);
+        document.getElementById('balance').innerText = '$' + parseFloat(bal).toFixed(2);
         loadTx();
-      } catch (e) { document.getElementById('txList').innerHTML = `<p style="padding:16px;color:#dc2626;text-align:center;">Error: ${e.message}</p>`; }
+      } catch (e) {
+        document.getElementById('txList').innerHTML = `<p style="padding:16px;color:#dc2626;text-align:center;">Error: ${e.message}</p>`;
+      }
     }
+
     async function loadTx() {
       try {
-        const r = await fetch(`${URL}/rest/v1/transactions?or=(sender_id.eq.${myId},receiver_id.eq.${myId})&order=created_at.desc&limit=10`, { headers: H });
-        const txs = await r.json();
+        const q1 = query(collection(db, "transactions"), where("sender_id", "==", myId));
+        const q2 = query(collection(db, "transactions"), where("receiver_id", "==", myId));
+        const [s1, s2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+        let txs = [];
+        s1.forEach(d => txs.push(d.data()));
+        s2.forEach(d => txs.push(d.data()));
+        txs.sort((a, b) => b.ts - a.ts);
         const l = document.getElementById('txList');
-        if (!txs || !txs.length) { l.innerHTML = '<p style="padding:16px 0;color:#6b7280;text-align:center;">Sin movimientos aún</p>'; return; }
-        l.innerHTML = txs.map(t => { const o = t.sender_id === myId; return `<div class="tx-item"><div><strong>${o ? 'Enviado a ' + t.receiver_id : 'Recibido de ' + t.sender_id}</strong><br><small style="color:#6b7280;">${new Date(t.created_at).toLocaleDateString()}</small></div><span class="${o ? 'tx-out' : 'tx-in'}">${o ? '-' : '+'}$${parseFloat(t.amount).toFixed(2)}</span></div>`; }).join('');
+        if (!txs.length) { l.innerHTML = '<p style="padding:16px 0;color:#6b7280;text-align:center;">Sin movimientos aún</p>'; return; }
+        l.innerHTML = txs.slice(0, 10).map(t => {
+          const o = t.sender_id === myId;
+          return `<div class="tx-item"><div><strong>${o ? 'Enviado a ' + t.receiver_id : 'Recibido de ' + t.sender_id}</strong><br><small style="color:#6b7280;">${new Date(t.ts).toLocaleDateString()}</small></div><span class="${o ? 'tx-out' : 'tx-in'}">${o ? '-' : '+'}$${parseFloat(t.amount).toFixed(2)}</span></div>`;
+        }).join('');
       } catch (e) {}
     }
-    async function sendMoney() {
-      const d = document.getElementById('destInput').value.trim(), a = parseFloat(document.getElementById('amountInput').value), b = document.getElementById('sendBtn');
-      if (!d || isNaN(a) || a <= 0) return tg?.showAlert('Datos inválidos');
+
+    window.sendMoney = async function() {
+      const d = document.getElementById('destInput').value.trim().replace('@', '').toLowerCase();
+      const a = parseFloat(document.getElementById('amountInput').value);
+      const b = document.getElementById('sendBtn');
+      if (!d || isNaN(a) || a <= 0) return tg?.showAlert('Ingresa destinatario y monto válido');
       b.disabled = true; b.innerText = 'Procesando...';
       try {
-        const r = await fetch(`${URL}/rest/v1/rpc/transfer_funds`, { method: 'POST', headers: H, body: JSON.stringify({ p_sender_id: myId, p_receiver_input: d, p_amount: a }) });
-        const res = await r.json();
-        if (!r.ok) tg?.showAlert('Error: ' + (res.message || r.status));
-        else if (res !== 'OK') tg?.showAlert(res);
-        else { tg?.HapticFeedback?.notificationOccurred('success'); tg?.showAlert(`¡Enviado $${a.toFixed(2)}!`); document.getElementById('destInput').value = ''; document.getElementById('amountInput').value = ''; init(); }
-      } catch (e) { tg?.showAlert('Red: ' + e.message); }
+        let destId = null;
+        const directSnap = await getDoc(doc(db, "wallets", d));
+        if (directSnap.exists()) destId = d;
+        else {
+          const qUser = query(collection(db, "wallets"), where("username", "==", d));
+          const uSnap = await getDocs(qUser);
+          if (!uSnap.empty) destId = uSnap.docs[0].id;
+        }
+        if (!destId) throw new Error('Usuario destino no encontrado');
+        if (destId === myId) throw new Error('No puedes enviarte dinero a ti mismo');
+
+        await runTransaction(db, async (tx) => {
+          const sRef = doc(db, "wallets", myId), rRef = doc(db, "wallets", destId);
+          const sDoc = await tx.get(sRef), rDoc = await tx.get(rRef);
+          if (sDoc.data().balance < a) throw new Error('Saldo insuficiente');
+          tx.update(sRef, { balance: sDoc.data().balance - a });
+          tx.update(rRef, { balance: rDoc.data().balance + a });
+        });
+        await addDoc(collection(db, "transactions"), { sender_id: myId, receiver_id: destId, amount: a, ts: Date.now() });
+        tg?.HapticFeedback?.notificationOccurred('success');
+        tg?.showAlert(`¡Enviado $${a.toFixed(2)} con éxito!`);
+        document.getElementById('destInput').value = '';
+        document.getElementById('amountInput').value = '';
+        init();
+      } catch (e) { tg?.showAlert(e.message); }
       b.disabled = false; b.innerText = 'Confirmar Envío';
-    }
-    function switchTab(t) {
+    };
+
+    window.switchTab = function(t) {
       document.getElementById('panelSend').classList.toggle('show', t === 'send');
       document.getElementById('panelReceive').classList.toggle('show', t === 'receive');
       document.getElementById('tabSend').classList.toggle('active', t === 'send');
       document.getElementById('tabReceive').classList.toggle('active', t === 'receive');
-    }
-    function copyAddress() {
+    };
+
+    window.copyAddress = function() {
       const txt = myUser ? '@' + myUser : myId;
       navigator.clipboard.writeText(txt);
       tg?.showAlert('Copiado: ' + txt);
-    }
+    };
+
     init();
   </script>
 </body>
