@@ -6,263 +6,119 @@
   <title>RUSDPAY Wallet</title>
   <script src="https://telegram.org"></script>
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f4f6f9;
-      color: #111827;
-      margin: 0;
-      padding: 16px;
-      padding-bottom: 40px;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f4f6f9; color: #111827; margin: 0; padding: 16px; padding-bottom: 40px; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .badge {
-      font-size: 12px;
-      background: #e5e7eb;
-      color: #374151;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-weight: 600;
-    }
-    .balance-card {
-      background: linear-gradient(135deg, #1d4ed8, #2563eb);
-      padding: 24px;
-      border-radius: 20px;
-      color: #ffffff;
-      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
-      margin-bottom: 20px;
-    }
+    .badge { font-size: 12px; background: #e5e7eb; color: #374151; padding: 6px 10px; border-radius: 8px; font-weight: 600; }
+    .balance-card { background: linear-gradient(135deg, #1d4ed8, #2563eb); padding: 24px; border-radius: 20px; color: #fff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); margin-bottom: 20px; }
     .balance-card small { opacity: 0.9; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
     .balance-card h1 { font-size: 38px; margin: 6px 0; font-weight: 700; }
     .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-    .btn-action {
-      background: #ffffff;
-      color: #1f2937;
-      border: 1px solid #e5e7eb;
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    }
-    .btn-action.active { background: #2563eb; color: #ffffff; border-color: #2563eb; }
-    .panel {
-      background: #ffffff;
-      padding: 18px;
-      border-radius: 16px;
-      margin-bottom: 20px;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+    .btn-action { background: #fff; color: #1f2937; border: 1px solid #e5e7eb; padding: 14px; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .btn-action.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .panel { background: #fff; padding: 18px; border-radius: 16px; margin-bottom: 20px; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     .panel.show { display: block; }
-    input {
-      width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px;
-      border: 1px solid #d1d5db; background: #f9fafb; color: #111827;
-      box-sizing: border-box; font-size: 16px;
-    }
-    input:focus { outline: none; border-color: #2563eb; background: #ffffff; }
-    .btn-primary {
-      width: 100%; padding: 15px; border-radius: 12px; border: none;
-      background: #2563eb; color: #ffffff; font-size: 16px; font-weight: bold; cursor: pointer;
-    }
+    input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #d1d5db; background: #f9fafb; color: #111827; box-sizing: border-box; font-size: 16px; }
+    .btn-primary { width: 100%; padding: 15px; border-radius: 12px; border: none; background: #2563eb; color: #fff; font-size: 16px; font-weight: bold; cursor: pointer; }
     .qr-box { text-align: center; }
     .qr-box img { border-radius: 12px; border: 1px solid #e5e7eb; padding: 10px; margin: 10px 0; }
-    .tx-container {
-      background: #ffffff;
-      padding: 4px 16px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .tx-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 0; border-bottom: 1px solid #f3f4f6;
-    }
-    .tx-item:last-child { border-bottom: none; }
+    .tx-container { background: #fff; padding: 4px 16px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f3f4f6; }
     .tx-in { color: #16a34a; font-weight: bold; }
     .tx-out { color: #dc2626; font-weight: bold; }
   </style>
 </head>
 <body>
-
   <div class="header">
-    <div>
-      <small style="color: #6b7280;">Bienvenido,</small>
-      <h3 id="userName" style="margin:0; color: #111827;">Usuario</h3>
-    </div>
+    <div><small style="color:#6b7280;">Bienvenido,</small><h3 id="userName" style="margin:0;">Usuario</h3></div>
     <span id="userIdBadge" class="badge">ID: ---</span>
   </div>
-
   <div class="balance-card">
     <small>Saldo Disponible (RUSD)</small>
     <h1 id="balance">$0.00</h1>
     <small id="userHandle">@usuario</small>
   </div>
-
   <div class="actions">
     <button class="btn-action active" id="tabSend" onclick="switchTab('send')">↑ Enviar</button>
     <button class="btn-action" id="tabReceive" onclick="switchTab('receive')">↓ Recibir</button>
   </div>
-
   <div id="panelSend" class="panel show">
-    <h4 style="margin-top:0; color: #111827;">Transferir Fondos</h4>
+    <h4 style="margin-top:0;">Transferir Fondos</h4>
     <input type="text" id="destInput" placeholder="Usuario (@ejemplo) o ID numérico">
     <input type="number" id="amountInput" step="0.01" placeholder="Monto (ej. 15.50)">
     <button class="btn-primary" id="sendBtn" onclick="sendMoney()">Confirmar Envío</button>
   </div>
-
   <div id="panelReceive" class="panel qr-box">
-    <h4 style="margin-top:0; color: #111827;">Tu Dirección de Recepción</h4>
-    <p style="font-size: 13px; color: #6b7280;">Comparte tu ID o @usuario para recibir pagos instantáneos.</p>
-    <img id="qrImage" src="" alt="QR Code" width="160" height="160">
+    <h4 style="margin-top:0;">Tu Dirección de Recepción</h4>
+    <p style="font-size:13px; color:#6b7280;">Comparte tu ID o @usuario para recibir pagos.</p>
+    <img id="qrImage" src="" alt="QR" width="160" height="160">
     <button class="btn-primary" onclick="copyAddress()">Copiar mi ID / Usuario</button>
   </div>
-
-  <h4 style="margin-bottom: 8px; color: #374151;">Últimos Movimientos</h4>
-  <div id="txList" class="tx-container">
-    <p style="padding: 16px 0; color: #6b7280; text-align: center;">Conectando con servidor...</p>
-  </div>
-
+  <h4 style="margin-bottom:8px; color:#374151;">Últimos Movimientos</h4>
+  <div id="txList" class="tx-container"><p style="padding:16px 0; color:#6b7280; text-align:center;">Conectando...</p></div>
   <script>
-    const SUPABASE_URL = 'https://nhqxqhufapuuuzmniqau.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_orHEYU_1dOe8zBwaiunzRQ_3F2STA2n';
-
-    const HEADERS = {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    };
-
+    const URL = 'https://supabase.co';
+    const KEY = 'sb_publishable_orHEYU_1dOe8zBwaiunzRQ_3F2STA2n';
+    const H = { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
+    if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#f4f6f9'); tg.setBackgroundColor('#f4f6f9'); } catch(e) {} }
+    const u = tg?.initDataUnsafe?.user || { id: 123456789, first_name: 'Usuario Demo', username: 'demo' };
+    const myId = String(u.id), myUser = u.username || '';
+    document.getElementById('userName').innerText = u.first_name;
+    document.getElementById('userIdBadge').innerText = 'ID: ' + myId;
+    document.getElementById('userHandle').innerText = myUser ? '@' + myUser : 'ID: ' + myId;
+    document.getElementById('qrImage').src = 'https://qrserver.com' + (myUser || myId);
+    async function init() {
       try {
-        tg.setHeaderColor('#f4f6f9');
-        tg.setBackgroundColor('#f4f6f9');
-      } catch(e) {}
+        const r = await fetch(`${URL}/rest/v1/wallets?tg_id=eq.${myId}&select=*`, { headers: H });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const rows = await r.json();
+        let w = rows;
+        if (!w) {
+          const cr = await fetch(`${URL}/rest/v1/wallets`, { method: 'POST', headers: H, body: JSON.stringify({ tg_id: myId, username: myUser, first_name: u.first_name, balance: 100.00 }) });
+          if (!cr.ok) throw new Error('Crear: ' + cr.status);
+          const created = await cr.json();
+          w = created;
+        } else if (w.username !== myUser) {
+          await fetch(`${URL}/rest/v1/wallets?tg_id=eq.${myId}`, { method: 'PATCH', headers: H, body: JSON.stringify({ username: myUser }) });
+        }
+        if (w) document.getElementById('balance').innerText = '$' + parseFloat(w.balance).toFixed(2);
+        loadTx();
+      } catch (e) { document.getElementById('txList').innerHTML = `<p style="padding:16px;color:#dc2626;text-align:center;">Error: ${e.message}</p>`; }
     }
-
-    const tgUser = tg?.initDataUnsafe?.user || { id: 123456789, first_name: 'Usuario Demo', username: 'demo' };
-    const myId = String(tgUser.id);
-    const myUsername = tgUser.username || '';
-
-    document.getElementById('userName').innerText = tgUser.first_name;
-    document.getElementById('userIdBadge').innerText = `ID: ${myId}`;
-    document.getElementById('userHandle').innerText = myUsername ? `@${myUsername}` : `ID: ${myId}`;
-    document.getElementById('qrImage').src = `https://qrserver.com{myUsername || myId}`;
-
-    async function initWallet() {
+    async function loadTx() {
       try {
-        // 1. Buscar billetera
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/wallets?tg_id=eq.${myId}&select=*`, { headers: HEADERS });
-        if (!res.ok) throw new Error('Error HTTP ' + res.status);
-        const rows = await res.json();
-        let wallet = rows[0];
-
-        // 2. Si no existe, crearla con $100.00
-        if (!wallet) {
-          const createRes = await fetch(`${SUPABASE_URL}/rest/v1/wallets`, {
-            method: 'POST',
-            headers: HEADERS,
-            body: JSON.stringify({
-              tg_id: myId,
-              username: myUsername,
-              first_name: tgUser.first_name,
-              balance: 100.00
-            })
-          });
-          if (!createRes.ok) throw new Error('No se pudo crear cuenta: ' + createRes.status);
-          const created = await createRes.json();
-          wallet = created[0];
-        } else if (wallet.username !== myUsername) {
-          await fetch(`${SUPABASE_URL}/rest/v1/wallets?tg_id=eq.${myId}`, {
-            method: 'PATCH',
-            headers: HEADERS,
-            body: JSON.stringify({ username: myUsername })
-          });
-        }
-
-        if (wallet) {
-          document.getElementById('balance').innerText = `$${parseFloat(wallet.balance).toFixed(2)}`;
-        }
-        loadHistory();
-      } catch (err) {
-        document.getElementById('txList').innerHTML = `<p style="padding:16px;color:#dc2626;text-align:center;font-size:13px;">Detalle: ${err.message}</p>`;
-      }
-    }
-
-    async function loadHistory() {
-      try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/transactions?or=(sender_id.eq.${myId},receiver_id.eq.${myId})&order=created_at.desc&limit=10`, { headers: HEADERS });
-        const txs = await res.json();
-
-        const list = document.getElementById('txList');
-        if (!txs || txs.length === 0) {
-          list.innerHTML = '<p style="padding: 16px 0; color: #6b7280; text-align: center;">Sin movimientos aún</p>';
-          return;
-        }
-
-        list.innerHTML = txs.map(tx => {
-          const isOut = tx.sender_id === myId;
-          return `
-            <div class="tx-item">
-              <div>
-                <strong style="color:#111827;">${isOut ? 'Enviado a ' + tx.receiver_id : 'Recibido de ' + tx.sender_id}</strong><br>
-                <small style="color: #6b7280;">${new Date(tx.created_at).toLocaleDateString()}</small>
-              </div>
-              <span class="${isOut ? 'tx-out' : 'tx-in'}">
-                ${isOut ? '-' : '+'}$${parseFloat(tx.amount).toFixed(2)}
-              </span>
-            </div>
-          `;
-        }).join('');
+        const r = await fetch(`${URL}/rest/v1/transactions?or=(sender_id.eq.${myId},receiver_id.eq.${myId})&order=created_at.desc&limit=10`, { headers: H });
+        const txs = await r.json();
+        const l = document.getElementById('txList');
+        if (!txs || !txs.length) { l.innerHTML = '<p style="padding:16px 0;color:#6b7280;text-align:center;">Sin movimientos aún</p>'; return; }
+        l.innerHTML = txs.map(t => { const o = t.sender_id === myId; return `<div class="tx-item"><div><strong>${o ? 'Enviado a ' + t.receiver_id : 'Recibido de ' + t.sender_id}</strong><br><small style="color:#6b7280;">${new Date(t.created_at).toLocaleDateString()}</small></div><span class="${o ? 'tx-out' : 'tx-in'}">${o ? '-' : '+'}$${parseFloat(t.amount).toFixed(2)}</span></div>`; }).join('');
       } catch (e) {}
     }
-
     async function sendMoney() {
-      const dest = document.getElementById('destInput').value.trim();
-      const amount = parseFloat(document.getElementById('amountInput').value);
-      const btn = document.getElementById('sendBtn');
-
-      if (!dest || isNaN(amount) || amount <= 0) {
-        tg?.showAlert('Completa un destinatario y un monto válido.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = 'Procesando...';
-
+      const d = document.getElementById('destInput').value.trim(), a = parseFloat(document.getElementById('amountInput').value), b = document.getElementById('sendBtn');
+      if (!d || isNaN(a) || a <= 0) return tg?.showAlert('Datos inválidos');
+      b.disabled = true; b.innerText = 'Procesando...';
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/transfer_funds`, {
-          method: 'POST',
-          headers: HEADERS,
-          body: JSON.stringify({
-            p_sender_id: myId,
-            p_receiver_input: dest,
-            p_amount: amount
-          })
-        });
-        const data = await res.json();
-
-        if (!res.ok) {
-          tg?.showAlert('Error servidor: ' + (data.message || res.status));
-        } else if (data !== 'OK') {
-          tg?.showAlert(data);
-        } else {
-          tg?.HapticFeedback?.notificationOccurred('success');
-          tg?.showAlert(`¡Transferencia exitosa de $${amount.toFixed(2)}!`);
-          document.getElementById('destInput').value = '';
-          document.getElementById('amountInput').value = '';
-          initWallet();
-        }
-      } catch (err) {
-        tg?.showAlert('Error de red: ' + err.message);
-      }
-
-      btn.disabled = false;
-      btn.innerText = 'Confirmar Envío';
+        const r = await fetch(`${URL}/rest/v1/rpc/transfer_funds`, { method: 'POST', headers: H, body: JSON.stringify({ p_sender_id: myId, p_receiver_input: d, p_amount: a }) });
+        const res = await r.json();
+        if (!r.ok) tg?.showAlert('Error: ' + (res.message || r.status));
+        else if (res !== 'OK') tg?.showAlert(res);
+        else { tg?.HapticFeedback?.notificationOccurred('success'); tg?.showAlert(`¡Enviado $${a.toFixed(2)}!`); document.getElementById('destInput').value = ''; document.getElementById('amountInput').value = ''; init(); }
+      } catch (e) { tg?.showAlert('Red: ' + e.message); }
+      b.disabled = false; b.innerText = 'Confirmar Envío';
     }
-
-    function switchTab(tab) {
-      document.getElementById('panelSend').classList.toggle('show', tab === 'send');
+    function switchTab(t) {
+      document.getElementById('panelSend').classList.toggle('show', t === 'send');
+      document.getElementById('panelReceive').classList.toggle('show', t === 'receive');
+      document.getElementById('tabSend').classList.toggle('active', t === 'send');
+      document.getElementById('tabReceive').classList.toggle('active', t === 'receive');
+    }
+    function copyAddress() {
+      const txt = myUser ? '@' + myUser : myId;
+      navigator.clipboard.writeText(txt);
+      tg?.showAlert('Copiado: ' + txt);
+    }
+    init();
+  </script>
+</body>
+</html>
