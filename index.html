@@ -3,94 +3,227 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Billetera Telegram</title>
+  <title>RUSDPAY Wallet</title>
   <script src="https://telegram.org"></script>
+  <script src="https://jsdelivr.net"></script>
   <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background-color: var(--tg-theme-bg-color, #18181b);
-      color: var(--tg-theme-text-color, #ffffff);
-      margin: 0;
-      padding: 20px;
+    :root {
+      --bg: var(--tg-theme-bg-color, #0f172a);
+      --card: var(--tg-theme-secondary-bg-color, #1e293b);
+      --text: var(--tg-theme-text-color, #f8fafc);
+      --hint: var(--tg-theme-hint-color, #94a3b8);
+      --btn: var(--tg-theme-button-color, #3b82f6);
+      --btn-text: var(--tg-theme-button-text-color, #ffffff);
     }
-    .card {
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .balance-card {
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
       padding: 24px;
-      border-radius: 16px;
-      color: white;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-radius: 20px;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+      margin-bottom: 20px;
     }
-    .card span { font-size: 14px; opacity: 0.9; }
-    .card h1 { font-size: 36px; margin: 8px 0 0 0; }
-    input, button {
-      width: 100%;
-      padding: 15px;
-      margin-bottom: 12px;
-      border-radius: 10px;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
-    input {
-      background-color: var(--tg-theme-secondary-bg-color, #27272a);
-      border: 1px solid #3f3f46;
-      color: inherit;
-    }
-    button {
-      background-color: var(--tg-theme-button-color, #3b82f6);
-      color: var(--tg-theme-button-text-color, #ffffff);
-      border: none;
-      font-weight: bold;
+    .balance-card small { opacity: 0.85; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+    .balance-card h1 { font-size: 38px; margin: 6px 0; }
+    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .btn-action {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
     }
+    .btn-action.active { background: var(--btn); color: var(--btn-text); }
+    .panel { background: var(--card); padding: 18px; border-radius: 16px; margin-bottom: 20px; display: none; }
+    .panel.show { display: block; }
+    input {
+      width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1); background: var(--bg); color: var(--text);
+      box-sizing: border-box; font-size: 16px;
+    }
+    .btn-primary {
+      width: 100%; padding: 15px; border-radius: 12px; border: none;
+      background: var(--btn); color: var(--btn-text); font-size: 16px; font-weight: bold; cursor: pointer;
+    }
+    .qr-box { text-align: center; }
+    .qr-box img { border-radius: 12px; background: white; padding: 10px; margin: 10px 0; }
+    .tx-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .tx-in { color: #22c55e; font-weight: bold; }
+    .tx-out { color: #ef4444; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <h2 id="saludo">Hola, Usuario</h2>
-
-  <div class="card">
-    <span>Saldo Disponible</span>
-    <h1 id="saldo">$500.00</h1>
+  <div class="header">
+    <div>
+      <small style="color: var(--hint)">Bienvenido,</small>
+      <h3 id="userName" style="margin:0;">Cargando...</h3>
+    </div>
+    <span id="userIdBadge" style="font-size: 12px; background: var(--card); padding: 6px 10px; border-radius: 8px;">ID: ---</span>
   </div>
 
-  <input type="text" id="destinatario" placeholder="Usuario (@ejemplo) o dirección">
-  <input type="number" id="monto" step="0.01" placeholder="Monto a enviar ($)">
-  <button onclick="enviar()">Transferir Fondos</button>
+  <div class="balance-card">
+    <small>Saldo Disponible (RUSD)</small>
+    <h1 id="balance">$0.00</h1>
+    <small id="userHandle">@usuario</small>
+  </div>
+
+  <div class="actions">
+    <button class="btn-action active" id="tabSend" onclick="switchTab('send')">↑ Enviar</button>
+    <button class="btn-action" id="tabReceive" onclick="switchTab('receive')">↓ Recibir</button>
+  </div>
+
+  <div id="panelSend" class="panel show">
+    <h4 style="margin-top:0;">Transferir Fondos</h4>
+    <input type="text" id="destInput" placeholder="Usuario (@ejemplo) o ID numérico">
+    <input type="number" id="amountInput" step="0.01" placeholder="Monto (ej. 15.50)">
+    <button class="btn-primary" id="sendBtn" onclick="sendMoney()">Confirmar Envío</button>
+  </div>
+
+  <div id="panelReceive" class="panel qr-box">
+    <h4 style="margin-top:0;">Tu Dirección de Recepción</h4>
+    <p style="font-size: 13px; color: var(--hint);">Comparte tu ID o @usuario para recibir pagos instantáneos.</p>
+    <img id="qrImage" src="" alt="QR Code" width="160" height="160">
+    <button class="btn-primary" onclick="copyAddress()">Copiar mi ID / Usuario</button>
+  </div>
+
+  <h4 style="margin-bottom: 8px;">Últimos Movimientos</h4>
+  <div id="txList" style="background: var(--card); padding: 0 16px; border-radius: 16px;">
+    <p style="padding: 16px 0; color: var(--hint); text-align: center;">Cargando historial...</p>
+  </div>
 
   <script>
+    const SUPABASE_URL = 'https://supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_orHEYU_1dOe8zBwaiunzRQ_3F2STA2n';
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    // Mostrar nombre del usuario de Telegram
-    const user = tg.initDataUnsafe?.user;
-    if (user) {
-      document.getElementById('saludo').innerText = `Hola, ${user.first_name}`;
-    }
+    const tgUser = tg.initDataUnsafe?.user || { id: 123456789, first_name: 'Demo', username: 'demo_user' };
+    const myId = String(tgUser.id);
+    const myUsername = tgUser.username || '';
 
-    let saldoActual = 500.00;
+    document.getElementById('userName').innerText = tgUser.first_name;
+    document.getElementById('userIdBadge').innerText = `ID: ${myId}`;
+    document.getElementById('userHandle').innerText = myUsername ? `@${myUsername}` : `ID: ${myId}`;
+    document.getElementById('qrImage').src = `https://qrserver.com{myUsername || myId}`;
 
-    function enviar() {
-      const dest = document.getElementById('destinatario').value.trim();
-      const monto = parseFloat(document.getElementById('monto').value);
-
-      if (!dest || isNaN(monto) || monto <= 0) {
-        tg.showAlert('Ingresa un destinatario y un monto válido.');
-        return;
-      }
-      if (monto > saldoActual) {
-        tg.showAlert('Saldo insuficiente.');
-        return;
-      }
-
-      saldoActual -= monto;
-      document.getElementById('saldo').innerText = `$${saldoActual.toFixed(2)}`;
-      document.getElementById('destinatario').value = '';
-      document.getElementById('monto').value = '';
+    async function initWallet() {
+      let { data: wallet } = await db.from('wallets').select('*').eq('tg_id', myId).single();
       
-      tg.showAlert(`¡Enviaste $${monto.toFixed(2)} a ${dest}!`);
+      if (!wallet) {
+        const { data: newWallet } = await db.from('wallets').insert([{
+          tg_id: myId,
+          username: myUsername,
+          first_name: tgUser.first_name,
+          balance: 100.00
+        }]).select().single();
+        wallet = newWallet;
+      } else if (wallet.username !== myUsername) {
+        await db.from('wallets').update({ username: myUsername }).eq('tg_id', myId);
+      }
+
+      if (wallet) {
+        document.getElementById('balance').innerText = `$${parseFloat(wallet.balance).toFixed(2)}`;
+      }
+      loadHistory();
     }
+
+    async function loadHistory() {
+      const { data: txs } = await db.from('transactions')
+        .select('*')
+        .or(`sender_id.eq.${myId},receiver_id.eq.${myId}`)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      const list = document.getElementById('txList');
+      if (!txs || txs.length === 0) {
+        list.innerHTML = '<p style="padding: 16px 0; color: var(--hint); text-align: center;">Sin movimientos aún</p>';
+        return;
+      }
+
+      list.innerHTML = txs.map(tx => {
+        const isOut = tx.sender_id === myId;
+        return `
+          <div class="tx-item">
+            <div>
+              <strong>${isOut ? 'Enviado a ' + tx.receiver_id : 'Recibido de ' + tx.sender_id}</strong><br>
+              <small style="color: var(--hint)">${new Date(tx.created_at).toLocaleDateString()}</small>
+            </div>
+            <span class="${isOut ? 'tx-out' : 'tx-in'}">
+              ${isOut ? '-' : '+'}$${parseFloat(tx.amount).toFixed(2)}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function sendMoney() {
+      const dest = document.getElementById('destInput').value.trim();
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      const btn = document.getElementById('sendBtn');
+
+      if (!dest || isNaN(amount) || amount <= 0) {
+        tg.showAlert('Completa un destinatario y un monto válido.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Procesando...';
+
+      const { data, error } = await db.rpc('transfer_funds', {
+        p_sender_id: myId,
+        p_receiver_input: dest,
+        p_amount: amount
+      });
+
+      btn.disabled = false;
+      btn.innerText = 'Confirmar Envío';
+
+      if (error) {
+        tg.showAlert('Error de conexión: ' + error.message);
+      } else if (data !== 'OK') {
+        tg.showAlert(data);
+      } else {
+        tg.HapticFeedback?.notificationOccurred('success');
+        tg.showAlert(`¡Transferencia exitosa de $${amount.toFixed(2)}!`);
+        document.getElementById('destInput').value = '';
+        document.getElementById('amountInput').value = '';
+        initWallet();
+      }
+    }
+
+    function switchTab(tab) {
+      document.getElementById('panelSend').classList.toggle('show', tab === 'send');
+      document.getElementById('panelReceive').classList.toggle('show', tab === 'receive');
+      document.getElementById('tabSend').classList.toggle('active', tab === 'send');
+      document.getElementById('tabReceive').classList.toggle('active', tab === 'receive');
+    }
+
+    function copyAddress() {
+      const textToCopy = myUsername ? `@${myUsername}` : myId;
+      navigator.clipboard.writeText(textToCopy);
+      tg.showAlert(`Copiado: ${textToCopy}`);
+    }
+
+    initWallet();
   </script>
 </body>
 </html>
