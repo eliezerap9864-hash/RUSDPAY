@@ -6,31 +6,15 @@
   <title>RUSDPAY</title>
   <script src="https://telegram.org"></script>
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body {
-      margin: 0; padding: 16px 16px 85px 16px; color: #f8fafc; min-height: 100vh;
-      background: radial-gradient(circle at 80% 15%, rgba(56, 189, 248, 0.18), transparent 40%),
-                  radial-gradient(circle at 20% 25%, rgba(139, 92, 246, 0.22), transparent 45%), #090d16;
-    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { margin: 0; padding: 16px 16px 85px 16px; color: #f8fafc; min-height: 100vh; background: radial-gradient(circle at 80% 15%, rgba(56,189,248,0.18), transparent 40%), radial-gradient(circle at 20% 25%, rgba(139,92,246,0.22), transparent 45%), #090d16; }
     .top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-    .logo {
-      width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 20px; color: #38bdf8;
-      background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(139,92,246,0.2));
-      border: 1px solid rgba(56, 189, 248, 0.4); box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
-    }
+    .logo { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; color: #38bdf8; background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(139,92,246,0.2)); border: 1px solid rgba(56,189,248,0.4); }
     .title { font-size: 18px; font-weight: 800; background: linear-gradient(90deg, #38bdf8, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .sub { font-size: 13px; color: #94a3b8; }
-    .glass {
-      background: rgba(17, 24, 39, 0.72); border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 18px; padding: 16px; margin-bottom: 14px; backdrop-filter: blur(12px);
-    }
-    .hero { background: linear-gradient(135deg, rgba(14, 165, 233, 0.14), rgba(124, 58, 237, 0.16)); border: 1px solid rgba(56, 189, 248, 0.25); }
-    .pill {
-      display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px;
-      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 14px;
-    }
+    .glass { background: rgba(17,24,39,0.72); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+    .hero { background: linear-gradient(135deg, rgba(14,165,233,0.14), rgba(124,58,237,0.16)); border: 1px solid rgba(56,189,248,0.25); }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35); color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 14px; }
     .dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
     .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #94a3b8; font-weight: 700; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -40,28 +24,13 @@
     .tabs { display: grid; grid-template-columns: 1fr 1fr; background: #070a11; padding: 4px; border-radius: 12px; margin: 12px 0; border: 1px solid rgba(255,255,255,0.06); }
     .tab-btn { padding: 10px; border: none; border-radius: 9px; background: transparent; color: #94a3b8; font-weight: 700; cursor: pointer; }
     .tab-btn.active { background: linear-gradient(90deg, rgba(14,165,233,0.25), rgba(139,92,246,0.3)); color: #fff; border: 1px solid rgba(56,189,248,0.3); }
-    .copy-box {
-      display: flex; justify-content: space-between; align-items: center; background: #070a11;
-      border: 1px solid rgba(255,255,255,0.08); padding: 12px 14px; border-radius: 12px; margin: 8px 0 12px 0;
-    }
-    .copy-num { color: #38bdf8; font-weight: 700; font-size: 15px; letter-spacing: 1px; }
-    input {
-      width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-      background: #070a11; color: #fff; font-size: 15px; margin-bottom: 12px; outline: none;
-    }
-    .btn-glow {
-      width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 700; font-size: 15px; color: #fff; cursor: pointer;
-      background: linear-gradient(90deg, #0284c7, #7c3aed); box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
-    }
-    .nav {
-      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(9, 13, 22, 0.92);
-      border-top: 1px solid rgba(255,255,255,0.08); display: grid; grid-template-columns: repeat(4, 1fr);
-      padding: 8px 0 12px 0; backdrop-filter: blur(15px);
-    }
+    .copy-box { display: flex; justify-content: space-between; align-items: center; background: #070a11; border: 1px solid rgba(255,255,255,0.08); padding: 12px 14px; border-radius: 12px; margin: 8px 0 12px 0; }
+    .copy-num { color: #38bdf8; font-weight: 700; font-size: 15px; }
+    input { width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: #070a11; color: #fff; font-size: 15px; margin-bottom: 12px; outline: none; }
+    .btn-glow { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 700; font-size: 15px; color: #fff; cursor: pointer; background: linear-gradient(90deg, #0284c7, #7c3aed); }
+    .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(9,13,22,0.95); border-top: 1px solid rgba(255,255,255,0.08); display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 0 12px 0; }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #64748b; font-size: 11px; font-weight: 600; cursor: pointer; }
     .nav-item.active { color: #38bdf8; }
-    .nav-icon { width: 36px; height: 28px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .nav-item.active .nav-icon { background: rgba(56, 189, 248, 0.18); box-shadow: 0 0 12px rgba(56, 189, 248, 0.3); }
     .view { display: none; }
     .view.show { display: block; }
   </style>
@@ -69,13 +38,8 @@
 <body>
   <div class="top">
     <div class="logo">R</div>
-    <div>
-      <div class="title">RUSDPAY Wallet</div>
-      <div class="sub" id="uHello">Hola, Usuario</div>
-    </div>
+    <div><div class="title">RUSDPAY Wallet</div><div class="sub" id="uHello">Hola, Usuario</div></div>
   </div>
-
-  <!-- VISTA INICIO -->
   <div id="v-home" class="view show">
     <div class="glass hero">
       <div class="pill"><span class="dot"></span> Cuenta verificada · Activa</div>
@@ -86,29 +50,21 @@
       </div>
       <div class="rate">1 RUSD = 320 CUP · ID: <span id="uId">---</span></div>
     </div>
-
-    <div class="grid2">
-      <div class="glass"><div class="lbl">ENVÍOS</div><div class="val-cyan" id="txCount">0</div></div>
-      <div class="glass"><div class="lbl">REFERIDOS</div><div class="val-purple">0</div></div>
-    </div>
-
     <div class="glass">
       <div class="lbl">RECARGAR SALDO</div>
       <div class="tabs">
         <button class="tab-btn active" id="mRub" onclick="setMethod('RUB')">RUB (SBP)</button>
         <button class="tab-btn" id="mCup" onclick="setMethod('CUP')">CUP (Transfermóvil)</button>
       </div>
-      <div class="lbl" id="cardLbl">TRANSFIERE A LA TARJETA</div>
+      <div class="lbl">TRANSFIERE A LA TARJETA</div>
       <div class="copy-box">
         <span class="copy-num" id="cardNum">2202 2063 8841 0912</span>
         <button onclick="copyCard()" style="background:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.4);color:#38bdf8;border-radius:8px;padding:6px 10px;font-weight:bold;">Copiar</button>
       </div>
       <input type="number" id="depAmt" placeholder="Monto que transferiste">
-      <button class="btn-glow" onclick="alert('Solicitud de recarga enviada. Se acreditará tras verificar el comprobante.')">Notificar Transferencia</button>
+      <button class="btn-glow" onclick="alert('Solicitud enviada. Se acreditará tras verificar.')">Notificar Transferencia</button>
     </div>
   </div>
-
-  <!-- VISTA ENVIAR -->
   <div id="v-send" class="view">
     <div class="glass">
       <div class="lbl" style="margin-bottom:12px;">TRANSFERIR ENTRE USUARIOS</div>
@@ -117,43 +73,34 @@
       <button class="btn-glow" id="btnSend" onclick="sendMoney()">Confirmar Envío</button>
     </div>
   </div>
-
-  <!-- VISTA RECIBIR -->
   <div id="v-rec" class="view">
     <div class="glass" style="text-align:center;">
       <div class="lbl">TU CÓDIGO QR DE RECEPCIÓN</div>
       <img id="qrImg" width="170" height="170" style="background:#fff;padding:10px;border-radius:16px;margin:16px 0;">
-      <button class="btn-glow" onclick="copyMyId()">Copiar mi ID de Usuario</button>
+      <button class="btn-glow" onclick="copyMyId()">Copiar mi ID</button>
     </div>
   </div>
-
-  <!-- BARRA INFERIOR -->
   <div class="nav">
-    <div class="nav-item active" id="n-home" onclick="go('home')"><div class="nav-icon">🛡️</div>Inicio</div>
-    <div class="nav-item" id="n-send" onclick="go('send')"><div class="nav-icon">🚀</div>Enviar</div>
-    <div class="nav-item" id="n-rec" onclick="go('rec')"><div class="nav-icon">📥</div>Recibir</div>
-    <div class="nav-item" onclick="copyMyId()"><div class="nav-icon">👥</div>Referidos</div>
+    <div class="nav-item active" id="n-home" onclick="go('home')">🛡️<br>Inicio</div>
+    <div class="nav-item" id="n-send" onclick="go('send')">🚀<br>Enviar</div>
+    <div class="nav-item" id="n-rec" onclick="go('rec')">📥<br>Recibir</div>
+    <div class="nav-item" onclick="copyMyId()">👥<br>Referidos</div>
   </div>
-
   <script>
     const DB = "https://googleapis.com";
     const tg = window.Telegram && window.Telegram.WebApp;
     if (tg) { tg.ready(); tg.expand(); try { tg.setHeaderColor('#090d16'); tg.setBackgroundColor('#090d16'); } catch(e) {} }
-    const u = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : { id: "1001", first_name: "eliezerap98", username: "eliezerap98" };
+    const u = (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : { id: "1001", first_name: "Usuario", username: "" };
     const myId = String(u.id);
     document.getElementById('uHello').innerText = "Hola, " + (u.username || u.first_name);
     document.getElementById('uId').innerText = myId;
     document.getElementById('qrImg').src = "https://qrserver.com" + myId;
-
     async function load() {
       try {
         const r = await fetch(`${DB}/wallets/${myId}`);
         let bal = 100;
         if (r.status === 404) {
-          await fetch(`${DB}/wallets?documentId=${myId}`, {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fields: { balance: { doubleValue: 100 }, name: { stringValue: u.first_name } } })
-          });
+          await fetch(`${DB}/wallets?documentId=${myId}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: { balance: { doubleValue: 100 }, name: { stringValue: u.first_name } } }) });
         } else if (r.ok) {
           const d = await r.json();
           bal = Number(d.fields.balance.doubleValue || d.fields.balance.integerValue || 0);
@@ -162,47 +109,32 @@
         document.getElementById('balCup').innerText = (bal * 320).toLocaleString();
       } catch (e) {}
     }
-
     async function sendMoney() {
-      const to = document.getElementById('destId').value.trim();
-      const val = parseFloat(document.getElementById('sendAmt').value);
+      const to = document.getElementById('destId').value.trim(), val = parseFloat(document.getElementById('sendAmt').value);
       if (!to || isNaN(val) || val <= 0 || to === myId) return alert("Revisa el ID y el monto");
-      const btn = document.getElementById('btnSend');
-      btn.disabled = true; btn.innerText = "Procesando...";
+      const btn = document.getElementById('btnSend'); btn.disabled = true; btn.innerText = "Procesando...";
       try {
-        const r1 = await fetch(`${DB}/wallets/${myId}`);
-        const d1 = await r1.json();
-        const s1 = Number(d1.fields.balance.doubleValue || d1.fields.balance.integerValue || 0);
+        const r1 = await fetch(`${DB}/wallets/${myId}`), d1 = await r1.json(), s1 = Number(d1.fields.balance.doubleValue || d1.fields.balance.integerValue || 0);
         if (s1 < val) throw new Error("Saldo insuficiente");
-const r2 = await fetch(${DB}/wallets/${to});
-if (!r2.ok) throw new Error("El ID destino no existe");
-const d2 = await r2.json();
-const s2 = Number(d2.fields.balance.doubleValue || d2.fields.balance.integerValue || 0);
-await fetch(${DB}/wallets/${myId}?updateMask.fieldPaths=balance, {
-method: "PATCH", headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ fields: { balance: { doubleValue: s1 - val } } })
-});
-await fetch(${DB}/wallets/${to}?updateMask.fieldPaths=balance, {
-method: "PATCH", headers: { "Content-Type": "application/json" },
-body: JSON.stringify({ fields: { balance: { doubleValue: s2 + val } } })
-});
-alert("¡Transferencia exitosa de " + val + " RUSD!");
-document.getElementById('destId').value = ""; document.getElementById('sendAmt').value = "";
-load(); go('home');
-} catch (e) { alert(e.message); }
-btn.disabled = false; btn.innerText = "Confirmar Envío";
-}
-function setMethod(m) {
-document.getElementById('mRub').className = m === 'RUB' ? 'tab-btn active' : 'tab-btn';
-document.getElementById('mCup').className = m === 'CUP' ? 'tab-btn active' : 'tab-btn';
-document.getElementById('cardNum').innerText = m === 'RUB' ? '2202 2063 8841 0912' : '9224 0699 9697 0352';
-}
-function copyCard() { navigator.clipboard.writeText(document.getElementById('cardNum').innerText); alert("Tarjeta copiada"); }
-function copyMyId() { navigator.clipboard.writeText(myId); alert("Tu ID/Enlace de referido copiado: " + myId); }
-function go(v) {
-['home', 'send', 'rec'].forEach(x => {
-document.getElementById('v-' + x).className = x === v ? 'view show' : 'view';
-document.getElementById('n-' + x).className = x === v ? 'nav-item active' : 'nav-item';
-});
-}
-load();
+        const r2 = await fetch(`${DB}/wallets/${to}`);
+        if (!r2.ok) throw new Error("El ID destino no existe");
+        const d2 = await r2.json(), s2 = Number(d2.fields.balance.doubleValue || d2.fields.balance.integerValue || 0);
+        await fetch(`${DB}/wallets/${myId}?updateMask.fieldPaths=balance`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: { balance: { doubleValue: s1 - val } } }) });
+        await fetch(`${DB}/wallets/${to}?updateMask.fieldPaths=balance`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fields: { balance: { doubleValue: s2 + val } } }) });
+        alert("¡Transferencia exitosa!"); document.getElementById('destId').value = ""; document.getElementById('sendAmt').value = "";
+        load(); go('home');
+      } catch (e) { alert(e.message); }
+      btn.disabled = false; btn.innerText = "Confirmar Envío";
+    }
+    function setMethod(m) {
+      document.getElementById('mRub').className = m === 'RUB' ? 'tab-btn active' : 'tab-btn';
+      document.getElementById('mCup').className = m === 'CUP' ? 'tab-btn active' : 'tab-btn';
+      document.getElementById('cardNum').innerText = m === 'RUB' ? '2202 2063 8841 0912' : '9224 0699 9697 0352';
+    }
+    function copyCard() { navigator.clipboard.writeText(document.getElementById('cardNum').innerText); alert("Tarjeta copiada"); }
+    function copyMyId() { navigator.clipboard.writeText(myId); alert("ID copiado: " + myId); }
+    function go(v) { ['home','send','rec'].forEach(x => { document.getElementById('v-'+x).className = x===v?'view show':'view'; document.getElementById('n-'+x).className = x===v?'nav-item active':'nav-item'; }); }
+    load();
+  </script>
+</body>
+</html>
