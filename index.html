@@ -179,9 +179,7 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
   fill:white;
   stroke:none;
 }
-.access-info {
-  flex:1;
-}
+.access-info {flex:1}
 .access-info strong {
   display:block;
   margin-bottom:5px;
@@ -200,12 +198,8 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
   padding:8px 0;
   margin-bottom:12px;
 }
-.form-title {
-  margin:8px 0 18px;
-}
-#recaptcha-container {
-  margin:10px 0;
-}
+.form-title {margin:8px 0 18px}
+#recaptcha-container {margin:10px 0}
 @media(min-width:650px){
  .grid{grid-template-columns:repeat(4,1fr)}
  .container{padding:25px}
@@ -229,7 +223,6 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
     <h2 style="margin-top:22px">Bienvenido a tu wallet</h2>
     <p class="muted">Elige cómo quieres acceder</p>
 
-    <!-- OPCIONES PRINCIPALES -->
     <div id="accessOptions">
 
       <button class="access-option" id="emailAccessBtn">
@@ -375,7 +368,6 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
       onclick="showSection('admin')">Administración</button>
   </div>
 
-  <!-- INICIO -->
   <section id="home" class="section active">
     <h2>Mi billetera</h2>
 
@@ -407,7 +399,6 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
     </div>
   </section>
 
-  <!-- CAMBIOS -->
   <section id="exchange" class="section">
     <h2>Cambiar monedas</h2>
 
@@ -449,7 +440,6 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
     </div>
   </section>
 
-  <!-- P2P -->
   <section id="p2p" class="section">
     <h2>Mercado P2P</h2>
 
@@ -475,7 +465,6 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
     </div>
   </section>
 
-  <!-- HISTORIAL -->
   <section id="history" class="section">
     <h2>Historial</h2>
     <div class="card">
@@ -483,7 +472,6 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
     </div>
   </section>
 
-  <!-- ADMINISTRACIÓN -->
   <section id="admin" class="section">
     <h2>Panel de administración</h2>
 
@@ -628,8 +616,10 @@ $("phoneAccessBtn").addEventListener("click", () => {
 });
 
 $("backEmail").addEventListener("click", showAccessOptions);
+
 $("backPhone").addEventListener("click", () => {
  clearRecaptcha();
+ confirmationResult = null;
  showAccessOptions();
 });
 
@@ -638,17 +628,18 @@ function clearRecaptcha() {
   try {
    recaptchaVerifier.clear();
   } catch(error) {
-   console.warn(error);
+   console.warn("Error limpiando reCAPTCHA:", error);
   }
   recaptchaVerifier = null;
  }
 }
 
+// CORRECCIÓN: reCAPTCHA USA EL CONTENEDOR HTML
 function createRecaptcha() {
  if (!recaptchaVerifier) {
   recaptchaVerifier = new RecaptchaVerifier(
    auth,
-   "sendSmsBtn",
+   "recaptcha-container",
    {
     size: "invisible",
     callback: () => {
@@ -656,6 +647,7 @@ function createRecaptcha() {
     },
     "expired-callback": () => {
      message("La verificación expiró. Inténtalo otra vez.");
+     clearRecaptcha();
     }
    }
   );
@@ -688,10 +680,13 @@ $("sendSmsBtn").addEventListener("click", async () => {
  if (authFlowBusy) return;
 
  authFlowBusy = true;
+ $("sendSmsBtn").disabled = true;
  message("Preparando el envío del código...");
 
  try {
   const verifier = createRecaptcha();
+
+  await verifier.render();
 
   confirmationResult = await signInWithPhoneNumber(
    auth,
@@ -705,15 +700,21 @@ $("sendSmsBtn").addEventListener("click", async () => {
   message("Código enviado. Revisa tus mensajes SMS.");
 
  } catch(error) {
-  console.error(error);
+  console.error("ERROR FIREBASE SMS:", error);
+
   clearRecaptcha();
 
+  // MOSTRAR EL ERROR EXACTO DE FIREBASE
   message(
-   "No se pudo enviar el código. Comprueba el número, el dominio autorizado y la configuración de Firebase."
+   "Error Firebase: " +
+   (error.code || "sin código") +
+   " — " +
+   (error.message || "No se pudo enviar el SMS.")
   );
 
  } finally {
   authFlowBusy = false;
+  $("sendSmsBtn").disabled = false;
  }
 });
 
@@ -734,6 +735,7 @@ $("verifySmsBtn").addEventListener("click", async () => {
  if (authFlowBusy) return;
 
  authFlowBusy = true;
+ $("verifySmsBtn").disabled = true;
  message("Verificando código...");
 
  try {
@@ -744,11 +746,18 @@ $("verifySmsBtn").addEventListener("click", async () => {
   await showAuthenticatedUser(result.user);
 
  } catch(error) {
-  console.error(error);
-  message("Código incorrecto o vencido. Compruébalo e inténtalo otra vez.");
+  console.error("ERROR VERIFICANDO SMS:", error);
+
+  message(
+   "Error de verificación: " +
+   (error.code || "") +
+   " — " +
+   (error.message || "Código incorrecto o vencido.")
+  );
 
  } finally {
   authFlowBusy = false;
+  $("verifySmsBtn").disabled = false;
  }
 });
 
