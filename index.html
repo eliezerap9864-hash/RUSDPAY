@@ -132,6 +132,80 @@ small,.muted{color:var(--muted)}
 hr{border:0;border-top:1px solid var(--border);margin:18px 0}
 button:disabled{opacity:.5;cursor:not-allowed}
 footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
+
+/* ACCESO MODERNO */
+.access-option {
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  text-align:left;
+  padding:14px;
+  margin:12px 0;
+  background:#10243d;
+  border:1px solid #244363;
+  border-radius:17px;
+  color:white;
+  transition:background .2s,border .2s;
+}
+.access-option:hover {
+  background:#163454;
+  border-color:#36b9ff;
+}
+.access-icon {
+  width:54px;
+  height:54px;
+  min-width:54px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#2863a0;
+  color:white;
+}
+.access-icon svg {
+  width:26px;
+  height:26px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.access-icon.telegram {
+  background:#1689d5;
+}
+.access-icon.telegram svg {
+  fill:white;
+  stroke:none;
+}
+.access-info {
+  flex:1;
+}
+.access-info strong {
+  display:block;
+  margin-bottom:5px;
+}
+.access-info small {
+  display:block;
+  font-size:12px;
+}
+.access-arrow {
+  color:#69b9ff;
+  font-size:23px;
+}
+.back-button {
+  background:transparent;
+  color:#69b9ff;
+  padding:8px 0;
+  margin-bottom:12px;
+}
+.form-title {
+  margin:8px 0 18px;
+}
+#recaptcha-container {
+  margin:10px 0;
+}
 @media(min-width:650px){
  .grid{grid-template-columns:repeat(4,1fr)}
  .container{padding:25px}
@@ -150,46 +224,128 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 <!-- PANTALLA DE ACCESO -->
 <div id="loginScreen" class="login-wrap">
   <div class="card center">
+
     <div class="logo">RUSD<span>PAY</span></div>
     <h2 style="margin-top:22px">Bienvenido a tu wallet</h2>
-    <p class="muted">Accede a RUSDPAY WALLET</p>
+    <p class="muted">Elige cómo quieres acceder</p>
 
-    <form id="loginForm">
-      <label>Correo electrónico</label>
-      <input id="email" type="email"
-        placeholder="Tu correo" autocomplete="email" required>
+    <!-- OPCIONES PRINCIPALES -->
+    <div id="accessOptions">
 
-      <label>Contraseña</label>
-      <input id="password" type="password"
-        placeholder="Tu contraseña" autocomplete="current-password" required>
-
-      <button class="primary" style="width:100%" type="submit">
-        Iniciar sesión
+      <button class="access-option" id="emailAccessBtn">
+        <span class="access-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="5" width="18" height="14" rx="2"/>
+            <path d="m3 7 9 6 9-6"/>
+          </svg>
+        </span>
+        <span class="access-info">
+          <strong>Correo electrónico</strong>
+          <small>Accede con correo y contraseña</small>
+        </span>
+        <span class="access-arrow">›</span>
       </button>
-    </form>
 
-    <hr>
-
-    <button class="secondary" style="width:100%" id="registerBtn">
-      Crear una cuenta
-    </button>
-
-    <p style="margin-top:20px">
-      <button class="secondary" style="width:100%" disabled>
-        Acceder con teléfono (próximamente)
+      <button class="access-option" id="phoneAccessBtn">
+        <span class="access-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="6" y="2" width="12" height="20" rx="2"/>
+            <path d="M10 18h4"/>
+          </svg>
+        </span>
+        <span class="access-info">
+          <strong>Teléfono</strong>
+          <small>Recibe un código por SMS</small>
+        </span>
+        <span class="access-arrow">›</span>
       </button>
-    </p>
 
-    <button class="secondary" style="width:100%" disabled>
-      Acceder con Telegram (próximamente)
-    </button>
+      <button class="access-option" id="telegramAccessBtn">
+        <span class="access-icon telegram">
+          <svg viewBox="0 0 24 24">
+            <path d="M21.5 3.5 18.3 20c-.2 1.1-.9 1.3-1.8.8l-5-3.7-2.4 2.3c-.3.3-.6.6-1.2.6l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.3L5.5 13.4.6 11.9c-1.1-.3-1.1-1 .2-1.5L20 3c.9-.3 1.7.2 1.5.5Z"/>
+          </svg>
+        </span>
+        <span class="access-info">
+          <strong>Telegram</strong>
+          <small>Conecta con @rusdpaybot</small>
+        </span>
+        <span class="access-arrow">›</span>
+      </button>
+
+    </div>
+
+    <!-- ACCESO POR CORREO -->
+    <div id="emailPanel" class="hidden">
+      <button class="back-button" id="backEmail">← Volver</button>
+      <h3 class="form-title">Acceso con correo</h3>
+
+      <form id="loginForm">
+        <label>Correo electrónico</label>
+        <input id="email" type="email"
+          placeholder="Tu correo" autocomplete="email" required>
+
+        <label>Contraseña</label>
+        <input id="password" type="password"
+          placeholder="Tu contraseña" autocomplete="current-password" required>
+
+        <button class="primary" style="width:100%" type="submit">
+          Iniciar sesión
+        </button>
+      </form>
+
+      <hr>
+
+      <button class="secondary" style="width:100%" id="registerBtn">
+        Crear una cuenta
+      </button>
+    </div>
+
+    <!-- ACCESO POR TELÉFONO -->
+    <div id="phonePanel" class="hidden">
+      <button class="back-button" id="backPhone">← Volver</button>
+      <h3 class="form-title">Acceso con teléfono</h3>
+
+      <div id="phoneStep">
+        <label>Número de teléfono con código de país</label>
+        <input id="phoneNumber" type="tel"
+          placeholder="+34600123456"
+          autocomplete="tel">
+
+        <div id="recaptcha-container"></div>
+
+        <button class="primary" style="width:100%" id="sendSmsBtn" type="button">
+          Enviar código SMS
+        </button>
+
+        <p class="muted" style="font-size:12px">
+          Escribe tu número con el prefijo internacional, por ejemplo +34.
+        </p>
+      </div>
+
+      <div id="codeStep" class="hidden">
+        <label>Código de verificación</label>
+        <input id="smsCode" type="text"
+          inputmode="numeric" autocomplete="one-time-code"
+          placeholder="Introduce el código SMS">
+
+        <button class="primary" style="width:100%" id="verifySmsBtn" type="button">
+          Verificar código
+        </button>
+
+        <button class="secondary" style="width:100%;margin-top:10px"
+          id="resendSmsBtn" type="button">
+          Volver a enviar código
+        </button>
+      </div>
+    </div>
 
     <p id="loginMessage" class="muted"></p>
   </div>
 
   <div class="notice">
-    Para proteger tu cuenta, debes verificar tu correo electrónico
-    antes de entrar a RUSDPAY WALLET.
+    Protegemos tu acceso mediante verificación de identidad.
+    El correo requiere verificación antes de iniciar sesión.
   </div>
 </div>
 
@@ -406,7 +562,9 @@ import {
  createUserWithEmailAndPassword,
  sendEmailVerification,
  onAuthStateChanged,
- signOut
+ signOut,
+ RecaptchaVerifier,
+ signInWithPhoneNumber
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 import {
@@ -434,6 +592,8 @@ const $ = id => document.getElementById(id);
 let isAdmin = false;
 let currentUser = null;
 let authFlowBusy = false;
+let recaptchaVerifier = null;
+let confirmationResult = null;
 
 function message(text) {
  $("loginMessage").textContent = text;
@@ -446,6 +606,162 @@ function showLogin(text = "") {
  message(text);
 }
 
+function showAccessOptions() {
+ $("accessOptions").classList.remove("hidden");
+ $("emailPanel").classList.add("hidden");
+ $("phonePanel").classList.add("hidden");
+ message("");
+}
+
+$("emailAccessBtn").addEventListener("click", () => {
+ $("accessOptions").classList.add("hidden");
+ $("emailPanel").classList.remove("hidden");
+ message("");
+});
+
+$("phoneAccessBtn").addEventListener("click", () => {
+ $("accessOptions").classList.add("hidden");
+ $("phonePanel").classList.remove("hidden");
+ $("phoneStep").classList.remove("hidden");
+ $("codeStep").classList.add("hidden");
+ message("");
+});
+
+$("backEmail").addEventListener("click", showAccessOptions);
+$("backPhone").addEventListener("click", () => {
+ clearRecaptcha();
+ showAccessOptions();
+});
+
+function clearRecaptcha() {
+ if (recaptchaVerifier) {
+  try {
+   recaptchaVerifier.clear();
+  } catch(error) {
+   console.warn(error);
+  }
+  recaptchaVerifier = null;
+ }
+}
+
+function createRecaptcha() {
+ if (!recaptchaVerifier) {
+  recaptchaVerifier = new RecaptchaVerifier(
+   auth,
+   "sendSmsBtn",
+   {
+    size: "invisible",
+    callback: () => {
+     console.log("Verificación reCAPTCHA completada.");
+    },
+    "expired-callback": () => {
+     message("La verificación expiró. Inténtalo otra vez.");
+    }
+   }
+  );
+ }
+ return recaptchaVerifier;
+}
+
+// TELEGRAM: ABRE EL BOT.
+// LA AUTENTICACIÓN REAL REQUIERE VALIDACIÓN EN SERVIDOR.
+$("telegramAccessBtn").addEventListener("click", () => {
+ window.open(
+  "https://t.me/rusdpaybot?start=login",
+  "_blank",
+  "noopener,noreferrer"
+ );
+ message(
+  "Abre @rusdpaybot en Telegram. La validación de identidad se conectará mediante un servidor seguro."
+ );
+});
+
+// ENVIAR CÓDIGO SMS
+$("sendSmsBtn").addEventListener("click", async () => {
+ const phone = $("phoneNumber").value.trim();
+
+ if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+  message("Escribe el teléfono con prefijo internacional. Ejemplo: +34600123456");
+  return;
+ }
+
+ if (authFlowBusy) return;
+
+ authFlowBusy = true;
+ message("Preparando el envío del código...");
+
+ try {
+  const verifier = createRecaptcha();
+
+  confirmationResult = await signInWithPhoneNumber(
+   auth,
+   phone,
+   verifier
+  );
+
+  $("phoneStep").classList.add("hidden");
+  $("codeStep").classList.remove("hidden");
+
+  message("Código enviado. Revisa tus mensajes SMS.");
+
+ } catch(error) {
+  console.error(error);
+  clearRecaptcha();
+
+  message(
+   "No se pudo enviar el código. Comprueba el número, el dominio autorizado y la configuración de Firebase."
+  );
+
+ } finally {
+  authFlowBusy = false;
+ }
+});
+
+// VERIFICAR CÓDIGO SMS
+$("verifySmsBtn").addEventListener("click", async () => {
+ const code = $("smsCode").value.trim();
+
+ if (!confirmationResult) {
+  message("Primero solicita un código SMS.");
+  return;
+ }
+
+ if (!/^\d{6}$/.test(code)) {
+  message("Introduce el código de 6 dígitos.");
+  return;
+ }
+
+ if (authFlowBusy) return;
+
+ authFlowBusy = true;
+ message("Verificando código...");
+
+ try {
+  const result = await confirmationResult.confirm(code);
+  confirmationResult = null;
+  clearRecaptcha();
+
+  await showAuthenticatedUser(result.user);
+
+ } catch(error) {
+  console.error(error);
+  message("Código incorrecto o vencido. Compruébalo e inténtalo otra vez.");
+
+ } finally {
+  authFlowBusy = false;
+ }
+});
+
+// VOLVER A SOLICITAR SMS
+$("resendSmsBtn").addEventListener("click", () => {
+ confirmationResult = null;
+ $("smsCode").value = "";
+ $("codeStep").classList.add("hidden");
+ $("phoneStep").classList.remove("hidden");
+ clearRecaptcha();
+ message("Puedes solicitar un nuevo código.");
+});
+
 // MOSTRAR APLICACIÓN Y COMPROBAR ADMINISTRADOR
 async function showAuthenticatedUser(user) {
  currentUser = user;
@@ -453,7 +769,14 @@ async function showAuthenticatedUser(user) {
 
  $("loginScreen").classList.add("hidden");
  $("appScreen").classList.remove("hidden");
- $("userEmail").textContent = user.email || "Usuario";
+
+ const provider = user.providerData.map(p => p.providerId);
+
+ if (provider.includes("phone")) {
+  $("userEmail").textContent = user.phoneNumber || "Usuario por teléfono";
+ } else {
+  $("userEmail").textContent = user.email || "Usuario";
+ }
 
  showSection("home");
 
@@ -478,7 +801,7 @@ async function showAuthenticatedUser(user) {
  }
 }
 
-// INICIAR SESIÓN
+// INICIAR SESIÓN POR CORREO
 $("loginForm").addEventListener("submit", async e => {
  e.preventDefault();
 
@@ -494,28 +817,20 @@ $("loginForm").addEventListener("submit", async e => {
    $("password").value
   );
 
-  // VERIFICACIÓN OBLIGATORIA
   if (!result.user.emailVerified) {
-
    try {
     await sendEmailVerification(result.user);
-
     await signOut(auth);
 
-    showLogin(
-     "Tu correo todavía no está verificado. " +
-     "Te hemos enviado un enlace. Revisa tu bandeja " +
-     "de entrada y también la carpeta de spam."
+    message(
+     "Tu correo todavía no está verificado. Te hemos enviado un enlace. Revisa tu bandeja de entrada y la carpeta de spam."
     );
 
    } catch(error) {
     console.error(error);
     await signOut(auth);
 
-    showLogin(
-     "No pudimos enviar el correo de verificación. " +
-     "Inténtalo nuevamente."
-    );
+    message("No pudimos enviar el correo de verificación. Inténtalo nuevamente.");
    }
 
    return;
@@ -525,9 +840,7 @@ $("loginForm").addEventListener("submit", async e => {
 
  } catch(error) {
   console.error(error);
-  showLogin(
-   "No se pudo iniciar sesión. Revisa tu correo y contraseña."
-  );
+  message("No se pudo iniciar sesión. Revisa tu correo y contraseña.");
 
  } finally {
   authFlowBusy = false;
@@ -541,9 +854,7 @@ $("registerBtn").addEventListener("click", async () => {
  const password = $("password").value;
 
  if (!email || password.length < 6) {
-  message(
-   "Introduce un correo y una contraseña de al menos 6 caracteres."
-  );
+  message("Introduce un correo y una contraseña de al menos 6 caracteres.");
   return;
  }
 
@@ -560,20 +871,17 @@ $("registerBtn").addEventListener("click", async () => {
   );
 
   await sendEmailVerification(result.user);
-
   await signOut(auth);
 
-  showLogin(
-   "¡Cuenta creada correctamente! Te enviamos un correo. " +
-   "Abre el enlace de verificación antes de iniciar sesión."
+  message(
+   "¡Cuenta creada correctamente! Te enviamos un correo. Abre el enlace de verificación antes de iniciar sesión."
   );
 
  } catch(error) {
   console.error(error);
 
-  showLogin(
-   "No se pudo completar el registro. " +
-   "Comprueba el correo o intenta iniciar sesión si ya tienes cuenta."
+  message(
+   "No se pudo completar el registro. Comprueba el correo o intenta iniciar sesión si ya tienes cuenta."
   );
 
  } finally {
@@ -586,6 +894,7 @@ $("logoutBtn").addEventListener("click", async () => {
  await signOut(auth);
  currentUser = null;
  isAdmin = false;
+ showAccessOptions();
  showLogin("Sesión cerrada correctamente.");
 });
 
@@ -601,7 +910,11 @@ onAuthStateChanged(auth, async user => {
   return;
  }
 
- if (!user.emailVerified) {
+ const provider = user.providerData.map(p => p.providerId);
+ const usesEmailPassword = provider.includes("password");
+
+ // EXIGIR VERIFICACIÓN SOLO A CUENTAS DE CORREO
+ if (usesEmailPassword && !user.emailVerified) {
 
   try {
    await sendEmailVerification(user);
@@ -635,9 +948,7 @@ window.showSection = function(id) {
 
 // FUNCIONES DE DEMOSTRACIÓN
 window.demo = function() {
- alert(
-  "Función de demostración. Todavía no procesa dinero real."
- );
+ alert("Función de demostración. Todavía no procesa dinero real.");
 };
 
 window.calculate = function() {
