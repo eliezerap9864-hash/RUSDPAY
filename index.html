@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RUSDPAY WALLET</title>
+
 <style>
 :root {
   --bg:#071426;
@@ -15,7 +16,6 @@
   --white:#f4f8ff;
   --muted:#91a7c3;
   --border:#244363;
-  --green:#21c78a;
 }
 *{box-sizing:border-box}
 body {
@@ -41,7 +41,6 @@ button {
   color:white;
   border:1px solid var(--border);
 }
-.danger{background:#a83248;color:white}
 input,select {
   width:100%;
   padding:14px;
@@ -139,17 +138,16 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 }
 </style>
 </head>
-<body>
 
+<body>
 <div class="container">
 
-<!-- CABECERA -->
 <header class="topbar">
   <div class="logo">RUSD<span>PAY</span></div>
   <small>WALLET DIGITAL</small>
 </header>
 
-<!-- ACCESO -->
+<!-- PANTALLA DE ACCESO -->
 <div id="loginScreen" class="login-wrap">
   <div class="card center">
     <div class="logo">RUSD<span>PAY</span></div>
@@ -158,10 +156,12 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 
     <form id="loginForm">
       <label>Correo electrónico</label>
-      <input id="email" type="email" placeholder="Tu correo" required>
+      <input id="email" type="email"
+        placeholder="Tu correo" autocomplete="email" required>
 
       <label>Contraseña</label>
-      <input id="password" type="password" placeholder="Tu contraseña" required>
+      <input id="password" type="password"
+        placeholder="Tu contraseña" autocomplete="current-password" required>
 
       <button class="primary" style="width:100%" type="submit">
         Iniciar sesión
@@ -169,6 +169,7 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
     </form>
 
     <hr>
+
     <button class="secondary" style="width:100%" id="registerBtn">
       Crear una cuenta
     </button>
@@ -178,14 +179,17 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
         Acceder con teléfono (próximamente)
       </button>
     </p>
+
     <button class="secondary" style="width:100%" disabled>
       Acceder con Telegram (próximamente)
     </button>
+
     <p id="loginMessage" class="muted"></p>
   </div>
+
   <div class="notice">
-    Tu cuenta se autentica mediante Firebase. No compartas tu contraseña
-    ni códigos de acceso.
+    Para proteger tu cuenta, debes verificar tu correo electrónico
+    antes de entrar a RUSDPAY WALLET.
   </div>
 </div>
 
@@ -218,18 +222,30 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
   <!-- INICIO -->
   <section id="home" class="section active">
     <h2>Mi billetera</h2>
+
     <div class="grid">
-      <button class="action" onclick="demo()"><span>↗</span>Enviar</button>
-      <button class="action" onclick="demo()"><span>↙</span>Recibir</button>
-      <button class="action" onclick="showSection('exchange')"><span>⇄</span>Cambiar</button>
-      <button class="action" onclick="showSection('p2p')"><span>◎</span>Mercado P2P</button>
+      <button class="action" onclick="demo()">
+        <span>↗</span>Enviar
+      </button>
+      <button class="action" onclick="demo()">
+        <span>↙</span>Recibir
+      </button>
+      <button class="action" onclick="showSection('exchange')">
+        <span>⇄</span>Cambiar
+      </button>
+      <button class="action" onclick="showSection('p2p')">
+        <span>◎</span>Mercado P2P
+      </button>
     </div>
 
     <div class="card">
       <h3>Monedas disponibles</h3>
       <p>RUB · USD · USDT · CUP · BRL</p>
-      <p class="muted">Todas las operaciones se expresan en RUSD como saldo interno.</p>
+      <p class="muted">
+        Todas las operaciones se expresan en RUSD como saldo interno.
+      </p>
     </div>
+
     <div class="notice">
       Esta versión es demostrativa. No envía ni recibe dinero real.
     </div>
@@ -238,6 +254,7 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
   <!-- CAMBIOS -->
   <section id="exchange" class="section">
     <h2>Cambiar monedas</h2>
+
     <div class="card">
       <label>Quiero cambiar desde</label>
       <select id="fromCurrency">
@@ -260,13 +277,16 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
       </select>
 
       <label>Cantidad</label>
-      <input id="amount" type="number" min="0" placeholder="Introduce cantidad">
+      <input id="amount" type="number" min="0"
+        placeholder="Introduce cantidad">
 
       <button class="primary" style="width:100%" onclick="calculate()">
         Calcular cambio
       </button>
+
       <h3 id="calculationResult"></h3>
     </div>
+
     <div class="notice">
       La cotización debe ser configurada por el administrador.
       El cálculo mostrado es orientativo y no ejecuta una operación.
@@ -276,17 +296,22 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
   <!-- P2P -->
   <section id="p2p" class="section">
     <h2>Mercado P2P</h2>
+
     <div class="card">
       <h3>Compra y venta entre usuarios</h3>
       <p>Publica ofertas y encuentra usuarios para intercambiar.</p>
+
       <button class="primary" style="width:100%" onclick="demo()">
         Crear oferta
       </button>
+
       <hr>
+
       <p class="muted">
         El sistema P2P y su depósito en garantía todavía no están conectados.
       </p>
     </div>
+
     <div class="notice">
       En una versión operativa, el RUSD del vendedor debe quedar bloqueado
       en un backend seguro y liberarse únicamente tras confirmar la recepción
@@ -302,25 +327,32 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
     </div>
   </section>
 
-  <!-- ADMIN -->
+  <!-- ADMINISTRACIÓN -->
   <section id="admin" class="section">
     <h2>Panel de administración</h2>
+
     <div class="notice">
       Configuración de tasas y comisiones de la plataforma.
     </div>
 
     <div class="card">
       <h3>Tasas de cambio</h3>
+
       <label>USD → RUSD</label>
       <input id="rateUSD" type="number" step="any">
+
       <label>RUB → RUSD</label>
       <input id="rateRUB" type="number" step="any">
+
       <label>USDT → RUSD</label>
       <input id="rateUSDT" type="number" step="any">
+
       <label>CUP → RUSD</label>
       <input id="rateCUP" type="number" step="any">
+
       <label>BRL → RUSD</label>
       <input id="rateBRL" type="number" step="any">
+
       <button class="primary" style="width:100%" id="saveRates">
         Guardar tasas
       </button>
@@ -328,8 +360,10 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 
     <div class="card">
       <h3>Comisión</h3>
+
       <label>Comisión porcentual (%)</label>
       <input id="commission" type="number" step="any">
+
       <button class="primary" style="width:100%" id="saveCommission">
         Guardar comisión
       </button>
@@ -337,14 +371,18 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 
     <div class="card">
       <h3>Límites P2P</h3>
+
       <label>Mínimo</label>
       <input id="p2pMin" type="number">
+
       <label>Máximo</label>
       <input id="p2pMax" type="number">
+
       <button class="primary" style="width:100%" id="saveLimits">
         Guardar límites
       </button>
     </div>
+
     <p id="adminMessage" class="muted"></p>
   </section>
 
@@ -354,19 +392,28 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
   RUSDPAY WALLET · Plataforma digital
   <br>Versión de demostración
 </footer>
+
 </div>
 
 <script type="module">
+
 import { initializeApp } from
 "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 
 import {
- getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
- onAuthStateChanged, signOut
+ getAuth,
+ signInWithEmailAndPassword,
+ createUserWithEmailAndPassword,
+ sendEmailVerification,
+ onAuthStateChanged,
+ signOut
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 import {
- getFirestore, doc, getDoc, setDoc
+ getFirestore,
+ doc,
+ getDoc,
+ setDoc
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -383,59 +430,38 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const $ = id => document.getElementById(id);
+
 let isAdmin = false;
 let currentUser = null;
+let authFlowBusy = false;
 
 function message(text) {
  $("loginMessage").textContent = text;
 }
 
-$("loginForm").addEventListener("submit", async e => {
- e.preventDefault();
- message("Comprobando acceso...");
- try {
-  await signInWithEmailAndPassword(
-   auth, $("email").value.trim(), $("password").value
-  );
- } catch(error) {
-  message("No se pudo iniciar sesión. Revisa tus datos.");
- }
-});
+function showLogin(text = "") {
+ $("loginScreen").classList.remove("hidden");
+ $("appScreen").classList.add("hidden");
+ $("adminNav").classList.add("hidden");
+ message(text);
+}
 
-$("registerBtn").addEventListener("click", async () => {
- const email = $("email").value.trim();
- const password = $("password").value;
- if (!email || password.length < 6) {
-  message("Introduce un correo y una contraseña de al menos 6 caracteres.");
-  return;
- }
- try {
-  await createUserWithEmailAndPassword(auth,email,password);
- } catch(error) {
-  message("No se pudo crear la cuenta. Comprueba los datos.");
- }
-});
-
-$("logoutBtn").addEventListener("click", () => signOut(auth));
-
-onAuthStateChanged(auth, async user => {
+// MOSTRAR APLICACIÓN Y COMPROBAR ADMINISTRADOR
+async function showAuthenticatedUser(user) {
  currentUser = user;
  isAdmin = false;
-
- if (!user) {
-  $("loginScreen").classList.remove("hidden");
-  $("appScreen").classList.add("hidden");
-  $("adminNav").classList.add("hidden");
-  return;
- }
 
  $("loginScreen").classList.add("hidden");
  $("appScreen").classList.remove("hidden");
  $("userEmail").textContent = user.email || "Usuario";
+
  showSection("home");
 
  try {
-  const adminSnap = await getDoc(doc(db,"admins",user.uid));
+  const adminSnap = await getDoc(
+   doc(db,"admins",user.uid)
+  );
+
   isAdmin = adminSnap.exists() &&
             adminSnap.data().role === "admin";
 
@@ -445,45 +471,205 @@ onAuthStateChanged(auth, async user => {
   } else {
    $("adminNav").classList.add("hidden");
   }
+
  } catch(error) {
   console.error(error);
   $("adminNav").classList.add("hidden");
  }
+}
+
+// INICIAR SESIÓN
+$("loginForm").addEventListener("submit", async e => {
+ e.preventDefault();
+
+ if (authFlowBusy) return;
+
+ authFlowBusy = true;
+ message("Comprobando tu cuenta...");
+
+ try {
+  const result = await signInWithEmailAndPassword(
+   auth,
+   $("email").value.trim(),
+   $("password").value
+  );
+
+  // VERIFICACIÓN OBLIGATORIA
+  if (!result.user.emailVerified) {
+
+   try {
+    await sendEmailVerification(result.user);
+
+    await signOut(auth);
+
+    showLogin(
+     "Tu correo todavía no está verificado. " +
+     "Te hemos enviado un enlace. Revisa tu bandeja " +
+     "de entrada y también la carpeta de spam."
+    );
+
+   } catch(error) {
+    console.error(error);
+    await signOut(auth);
+
+    showLogin(
+     "No pudimos enviar el correo de verificación. " +
+     "Inténtalo nuevamente."
+    );
+   }
+
+   return;
+  }
+
+  await showAuthenticatedUser(result.user);
+
+ } catch(error) {
+  console.error(error);
+  showLogin(
+   "No se pudo iniciar sesión. Revisa tu correo y contraseña."
+  );
+
+ } finally {
+  authFlowBusy = false;
+ }
 });
 
+// REGISTRO CON CORREO
+$("registerBtn").addEventListener("click", async () => {
+
+ const email = $("email").value.trim();
+ const password = $("password").value;
+
+ if (!email || password.length < 6) {
+  message(
+   "Introduce un correo y una contraseña de al menos 6 caracteres."
+  );
+  return;
+ }
+
+ if (authFlowBusy) return;
+
+ authFlowBusy = true;
+ message("Creando tu cuenta...");
+
+ try {
+  const result = await createUserWithEmailAndPassword(
+   auth,
+   email,
+   password
+  );
+
+  await sendEmailVerification(result.user);
+
+  await signOut(auth);
+
+  showLogin(
+   "¡Cuenta creada correctamente! Te enviamos un correo. " +
+   "Abre el enlace de verificación antes de iniciar sesión."
+  );
+
+ } catch(error) {
+  console.error(error);
+
+  showLogin(
+   "No se pudo completar el registro. " +
+   "Comprueba el correo o intenta iniciar sesión si ya tienes cuenta."
+  );
+
+ } finally {
+  authFlowBusy = false;
+ }
+});
+
+// CERRAR SESIÓN
+$("logoutBtn").addEventListener("click", async () => {
+ await signOut(auth);
+ currentUser = null;
+ isAdmin = false;
+ showLogin("Sesión cerrada correctamente.");
+});
+
+// COMPROBAR SESIÓN AL ABRIR LA APLICACIÓN
+onAuthStateChanged(auth, async user => {
+
+ if (authFlowBusy) return;
+
+ if (!user) {
+  currentUser = null;
+  isAdmin = false;
+  showLogin();
+  return;
+ }
+
+ if (!user.emailVerified) {
+
+  try {
+   await sendEmailVerification(user);
+  } catch(error) {
+   console.error(error);
+  }
+
+  await signOut(auth);
+
+  showLogin(
+   "Debes verificar tu correo electrónico antes de entrar."
+  );
+
+  return;
+ }
+
+ await showAuthenticatedUser(user);
+});
+
+// NAVEGACIÓN
 window.showSection = function(id) {
+
  if (id === "admin" && !isAdmin) return;
- document.querySelectorAll(".section").forEach(s =>
-  s.classList.remove("active")
- );
+
+ document.querySelectorAll(".section").forEach(s => {
+  s.classList.remove("active");
+ });
+
  $(id).classList.add("active");
 };
 
+// FUNCIONES DE DEMOSTRACIÓN
 window.demo = function() {
- alert("Función de demostración. Todavía no procesa dinero real.");
+ alert(
+  "Función de demostración. Todavía no procesa dinero real."
+ );
 };
 
 window.calculate = function() {
+
  const amount = Number($("amount").value);
  const from = $("fromCurrency").value;
  const to = $("toCurrency").value;
 
  if (!amount || amount <= 0) {
-  $("calculationResult").textContent = "Introduce una cantidad válida.";
+  $("calculationResult").textContent =
+   "Introduce una cantidad válida.";
   return;
  }
 
  $("calculationResult").textContent =
-  "Solicitud de cálculo: " + amount + " " + from + " → " + to +
+  "Solicitud de cálculo: " + amount + " " + from +
+  " → " + to +
   ". Consulta las tasas configuradas por administración.";
 };
 
+// CARGAR CONFIGURACIÓN ADMINISTRATIVA
 async function loadSettings() {
+
  try {
-  const snap = await getDoc(doc(db,"settings","exchange"));
+  const snap = await getDoc(
+   doc(db,"settings","exchange")
+  );
+
   if (!snap.exists()) return;
 
   const d = snap.data();
+
   $("rateUSD").value = d.rateUSD ?? "";
   $("rateRUB").value = d.rateRUB ?? "";
   $("rateUSDT").value = d.rateUSDT ?? "";
@@ -492,51 +678,83 @@ async function loadSettings() {
   $("commission").value = d.commission ?? "";
   $("p2pMin").value = d.p2pMin ?? "";
   $("p2pMax").value = d.p2pMax ?? "";
+
  } catch(error) {
-  $("adminMessage").textContent = "No se pudieron cargar los ajustes.";
+  console.error(error);
+  $("adminMessage").textContent =
+   "No se pudieron cargar los ajustes.";
  }
 }
 
+// GUARDAR CONFIGURACIÓN
 async function saveSettings(fields) {
+
  if (!isAdmin || !currentUser) {
-  $("adminMessage").textContent = "Acceso de administrador requerido.";
+  $("adminMessage").textContent =
+   "Acceso de administrador requerido.";
   return;
  }
 
  const data = {};
+
  for (const [key,id] of Object.entries(fields)) {
+
   const value = $(id).value;
-  if (value === "" || !Number.isFinite(Number(value))) {
-   $("adminMessage").textContent = "Revisa los valores introducidos.";
+
+  if (
+   value === "" ||
+   !Number.isFinite(Number(value))
+  ) {
+   $("adminMessage").textContent =
+    "Revisa los valores introducidos.";
    return;
   }
+
   data[key] = Number(value);
  }
 
  try {
-  await setDoc(doc(db,"settings","exchange"),data,{merge:true});
-  $("adminMessage").textContent = "Configuración guardada correctamente.";
+
+  await setDoc(
+   doc(db,"settings","exchange"),
+   data,
+   {merge:true}
+  );
+
+  $("adminMessage").textContent =
+   "Configuración guardada correctamente.";
+
  } catch(error) {
-  $("adminMessage").textContent = "No se pudo guardar. Revisa Firebase.";
+  console.error(error);
+
+  $("adminMessage").textContent =
+   "No se pudo guardar. Revisa Firebase.";
  }
 }
 
-$("saveRates").addEventListener("click", () => saveSettings({
- rateUSD:"rateUSD",
- rateRUB:"rateRUB",
- rateUSDT:"rateUSDT",
- rateCUP:"rateCUP",
- rateBRL:"rateBRL"
-}));
+$("saveRates").addEventListener("click", () =>
+ saveSettings({
+  rateUSD:"rateUSD",
+  rateRUB:"rateRUB",
+  rateUSDT:"rateUSDT",
+  rateCUP:"rateCUP",
+  rateBRL:"rateBRL"
+ })
+);
 
-$("saveCommission").addEventListener("click", () => saveSettings({
- commission:"commission"
-}));
+$("saveCommission").addEventListener("click", () =>
+ saveSettings({
+  commission:"commission"
+ })
+);
 
-$("saveLimits").addEventListener("click", () => saveSettings({
- p2pMin:"p2pMin",
- p2pMax:"p2pMax"
-}));
+$("saveLimits").addEventListener("click", () =>
+ saveSettings({
+  p2pMin:"p2pMin",
+  p2pMax:"p2pMax"
+ })
+);
+
 </script>
 </body>
 </html>
