@@ -38,11 +38,14 @@ label{display:block;font-size:13px;color:#bdc9d8;margin-top:12px}
 input,select{width:100%;padding:13px;margin:7px 0 12px;border-radius:9px;border:1px solid #35465e;background:#0d1727;color:white;font-size:15px}
 input:disabled{opacity:.7}
 .primary{width:100%;margin-top:8px}
+.secondary{background:#263a55;color:white;width:100%;margin-top:8px}
 .notice{background:#342d19;color:#f5d77a;border:1px solid #6c5a25;padding:12px;border-radius:10px;font-size:12px;line-height:1.5;margin:12px 0}
 .rowline{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #293b54}
 .rowline:last-child{border:0}
 .yellow{color:#f0b90b}
 footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
+.hidden{display:none!important}
+#authMessage,#rateMessage,#commissionMessage,#limitMessage{overflow-wrap:anywhere}
 @media(max-width:450px){
  main{padding:13px}
  .actions{gap:5px}
@@ -55,7 +58,7 @@ footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
 
 <header>
   <div class="logo">RUSD<span>PAY</span></div>
-  <div class="status">● MODO DEMO</div>
+  <div class="status" id="appStatus">● MODO DEMO</div>
 </header>
 
 <main>
@@ -74,12 +77,29 @@ footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
     </div>
   </div>
 
+  <div class="panel" id="authPanel">
+    <h3>Acceso de administración</h3>
+    <p>Inicia sesión con la cuenta administradora creada en Firebase.</p>
+    <label>Correo electrónico</label>
+    <input id="adminEmail" type="email" autocomplete="username" placeholder="Tu correo">
+    <label>Contraseña</label>
+    <input id="adminPassword" type="password" autocomplete="current-password" placeholder="Tu contraseña">
+    <button class="primary" id="loginButton" onclick="loginAdmin()">Iniciar sesión</button>
+    <p id="authMessage" class="muted" aria-live="polite"></p>
+  </div>
+
+  <div class="panel hidden" id="adminSession">
+    <strong class="yellow">Sesión de administrador activa</strong>
+    <p id="adminEmailLabel" class="muted"></p>
+    <button class="secondary" onclick="logoutAdmin()">Cerrar sesión</button>
+  </div>
+
   <nav>
     <button class="active" data-tab="home" onclick="showTab('home',this)">Inicio</button>
     <button data-tab="exchange" onclick="showTab('exchange',this)">Cambio</button>
     <button data-tab="p2p" onclick="showTab('p2p',this)">P2P</button>
     <button data-tab="history" onclick="showTab('history',this)">Historial</button>
-    <button data-tab="admin" onclick="showTab('admin',this)">Administración</button>
+    <button id="adminNav" class="hidden" data-tab="admin" onclick="showTab('admin',this)">Administración</button>
   </nav>
 
   <section id="home" class="section show">
@@ -89,7 +109,6 @@ footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
       <div class="card"><strong>Vender RUSD</strong><small>Solicita un intercambio</small></div>
       <div class="card"><strong>Transferencias</strong><small>Entre usuarios</small></div>
     </div>
-
     <h2>Monedas disponibles</h2>
     <div class="cards">
       <div class="card"><strong>USD</strong><small>Dólar estadounidense</small></div>
@@ -109,28 +128,17 @@ footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
         <option value="to">Convertir a RUSD</option>
         <option value="from">Convertir desde RUSD</option>
       </select>
-
       <label id="fromLabel">Moneda que entregas</label>
       <select id="currency" onchange="calculateExchange()">
-        <option>USD</option>
-        <option>USDT</option>
-        <option>RUB</option>
-        <option>BRL</option>
-        <option>CUP</option>
+        <option>USD</option><option>USDT</option><option>RUB</option><option>BRL</option><option>CUP</option>
       </select>
-
       <label>Cantidad que entregas</label>
       <input id="exchangeAmount" type="number" min="0" step="any" placeholder="Introduce una cantidad" oninput="calculateExchange()">
-
       <label>Moneda que recibirás</label>
       <input id="resultCurrency" value="RUSD" disabled>
-
       <label>Resultado estimado</label>
       <input id="exchangeResult" placeholder="Configura primero una tasa" disabled>
-
-      <div id="exchangeRateInfo" class="notice">
-        Las tasas todavía no están configuradas.
-      </div>
+      <div id="exchangeRateInfo" class="notice">Las tasas todavía no están configuradas.</div>
       <button class="primary" onclick="demoMessage()">Solicitar cambio</button>
     </div>
   </section>
@@ -180,58 +188,46 @@ footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
 
   <section id="admin" class="section">
     <h2>Panel de Administración</h2>
-
-    <div class="notice">
-      PANEL DE DEMOSTRACIÓN: todavía no es privado. Cualquier persona que abra la página puede verlo. No introduzcas contraseñas ni datos secretos. La protección real se conectará mediante Firebase Authentication y permisos del servidor.
-    </div>
-
+    <div class="notice">Panel privado: el acceso se comprueba con Firebase Authentication y el registro de administrador en Firestore.</div>
     <div class="cards">
       <div class="card"><small>Monedas configurables</small><strong>5 monedas</strong></div>
       <div class="card"><small>Comisión general</small><strong id="commissionSummary">0%</strong></div>
-      <div class="card"><small>Estado del panel</small><strong class="yellow">Demostración</strong></div>
+      <div class="card"><small>Estado del panel</small><strong class="yellow">Conectado</strong></div>
     </div>
 
     <h2>Tasas de cambio</h2>
     <div class="panel">
-      <p>Indica cuántas unidades de cada moneda equivalen a 1 RUSD. No se presupone ninguna paridad ni tasa. Los valores que introduzcas aquí solo se guardan temporalmente en esta página.</p>
-
+      <p>Indica cuántas unidades de cada moneda equivalen a 1 RUSD. No se presupone ninguna paridad.</p>
       <label>1 RUSD equivale a cuántos USD</label>
       <input id="rateUSD" type="number" min="0" step="any" placeholder="Tasa USD">
-
       <label>1 RUSD equivale a cuántos USDT</label>
       <input id="rateUSDT" type="number" min="0" step="any" placeholder="Tasa USDT">
-
       <label>1 RUSD equivale a cuántos RUB</label>
       <input id="rateRUB" type="number" min="0" step="any" placeholder="Tasa RUB">
-
       <label>1 RUSD equivale a cuántos BRL</label>
       <input id="rateBRL" type="number" min="0" step="any" placeholder="Tasa BRL">
-
       <label>1 RUSD equivale a cuántos CUP</label>
       <input id="rateCUP" type="number" min="0" step="any" placeholder="Tasa CUP">
-
-      <button class="primary" onclick="saveRates()">Guardar tasas de demostración</button>
-      <p id="rateMessage" class="muted"></p>
+      <button class="primary" onclick="saveRates()">Guardar tasas</button>
+      <p id="rateMessage" class="muted" aria-live="polite"></p>
     </div>
 
     <h2>Comisiones</h2>
     <div class="panel">
       <label>Comisión general (%)</label>
       <input id="commission" type="number" min="0" max="100" step="0.01" value="0">
-      <button class="primary" onclick="saveCommission()">Guardar comisión de demostración</button>
-      <p id="commissionMessage" class="muted"></p>
+      <button class="primary" onclick="saveCommission()">Guardar comisión</button>
+      <p id="commissionMessage" class="muted" aria-live="polite"></p>
     </div>
 
     <h2>Límites de cambio</h2>
     <div class="panel">
       <label>Mínimo por operación (RUSD)</label>
       <input id="minLimit" type="number" min="0" step="any" value="0">
-
       <label>Máximo por operación (RUSD)</label>
       <input id="maxLimit" type="number" min="0" step="any" placeholder="Sin límite configurado">
-
-      <button class="primary" onclick="saveLimits()">Guardar límites de demostración</button>
-      <p id="limitMessage" class="muted"></p>
+      <button class="primary" onclick="saveLimits()">Guardar límites</button>
+      <p id="limitMessage" class="muted" aria-live="polite"></p>
     </div>
 
     <h2>Gestión de usuarios</h2>
@@ -251,175 +247,288 @@ footer{text-align:center;padding:28px 10px;color:#75849a;font-size:12px}
     </div>
   </section>
 
-  <footer>
-    RUSDPAY WALLET © 2026<br>
-    Plataforma en desarrollo · Modo demostración
-  </footer>
+  <footer>RUSDPAY WALLET © 2026<br>Plataforma en desarrollo · Modo demostración</footer>
 </main>
 
-<script>
-const rates = {
-  USD:null,
-  USDT:null,
-  RUB:null,
-  BRL:null,
-  CUP:null
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD_XLGqJHsHCWX-jJsWGplDkbLu6GGD3KU",
+  authDomain: "rusdpay.firebaseapp.com",
+  projectId: "rusdpay",
+  storageBucket: "rusdpay.firebasestorage.app",
+  messagingSenderId: "519480317804",
+  appId: "1:519480317804:web:55872c0371e022991ac549"
 };
 
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const rates = {USD:null,USDT:null,RUB:null,BRL:null,CUP:null};
 let commission = 0;
 let minLimit = 0;
 let maxLimit = null;
+let isAdmin = false;
 
-function showTab(id,button){
-  document.querySelectorAll('.section').forEach(section=>{
-    section.classList.remove('show');
-  });
-  document.getElementById(id).classList.add('show');
+const $ = id => document.getElementById(id);
 
-  document.querySelectorAll('nav button').forEach(btn=>{
-    btn.classList.remove('active');
-  });
-
-  if(button) button.classList.add('active');
+function message(id,text){
+  $(id).textContent = text;
 }
 
-function openSection(id){
-  document.querySelectorAll('.section').forEach(section=>{
-    section.classList.remove('show');
-  });
-  document.getElementById(id).classList.add('show');
-
-  document.querySelectorAll('nav button').forEach(btn=>{
-    btn.classList.toggle('active',btn.dataset.tab===id);
-  });
+function setAdminUI(user){
+  isAdmin = !!user;
+  $("adminNav").classList.toggle("hidden",!isAdmin);
+  $("adminSession").classList.toggle("hidden",!isAdmin);
+  $("authPanel").classList.toggle("hidden",isAdmin);
+  $("adminEmailLabel").textContent = user ? user.email : "";
+  $("appStatus").textContent = isAdmin ? "● ADMINISTRADOR" : "● MODO DEMO";
+  if(!isAdmin && $("admin").classList.contains("show")) showTab("home");
 }
 
-function updateExchange(){
-  const direction=document.getElementById('direction').value;
-  const currency=document.getElementById('currency').value;
-  const fromLabel=document.getElementById('fromLabel');
-  const resultCurrency=document.getElementById('resultCurrency');
-
-  if(direction==='to'){
-    fromLabel.textContent='Moneda que entregas';
-    resultCurrency.value='RUSD';
-  }else{
-    fromLabel.textContent='Moneda que recibirás';
-    resultCurrency.value=currency;
-  }
-
-  calculateExchange();
-}
-
-function calculateExchange(){
-  const direction=document.getElementById('direction').value;
-  const currency=document.getElementById('currency').value;
-  const amount=Number(document.getElementById('exchangeAmount').value);
-  const result=document.getElementById('exchangeResult');
-  const info=document.getElementById('exchangeRateInfo');
-
-  document.getElementById('resultCurrency').value=
-    direction==='to'?'RUSD':currency;
-
-  if(!Number.isFinite(amount)||amount<=0){
-    result.value='';
-    info.textContent='Introduce una cantidad para calcular el resultado estimado.';
+window.loginAdmin = async function(){
+  const email = $("adminEmail").value.trim();
+  const password = $("adminPassword").value;
+  if(!email || !password){
+    message("authMessage","Escribe tu correo y contraseña.");
     return;
   }
-
-  const rate=rates[currency];
-
-  if(rate===null||rate<=0){
-    result.value='';
-    info.textContent='No hay una tasa configurada para '+currency+'. Puedes establecerla en Administración.';
-    return;
-  }
-
-  let converted;
-
-  if(direction==='to'){
-    converted=amount/rate;
-    info.textContent='Tasa de demostración: 1 RUSD = '+rate+' '+currency+'.';
-  }else{
-    converted=amount*rate;
-    info.textContent='Tasa de demostración: 1 RUSD = '+rate+' '+currency+'.';
-  }
-
-  result.value=converted.toFixed(4);
-}
-
-function saveRates(){
-  const currencies=['USD','USDT','RUB','BRL','CUP'];
-
-  for(const currency of currencies){
-    const value=document.getElementById('rate'+currency).value;
-    const number=Number(value);
-
-    if(value.trim()===''||!Number.isFinite(number)||number<=0){
-      alert('Introduce una tasa válida y mayor que cero para '+currency+'.');
+  $("loginButton").disabled = true;
+  message("authMessage","Verificando acceso...");
+  try{
+    const result = await signInWithEmailAndPassword(auth,email,password);
+    const adminRef = doc(db,"admins",result.user.uid);
+    const adminSnap = await getDoc(adminRef);
+    if(!adminSnap.exists() || adminSnap.data().role !== "admin"){
+      await signOut(auth);
+      message("authMessage","Esta cuenta no tiene permisos de administrador.");
       return;
     }
+    $("adminPassword").value = "";
+    message("authMessage","Acceso autorizado.");
+  }catch(error){
+    console.error(error);
+    message("authMessage","No se pudo iniciar sesión. Revisa el correo, la contraseña y la conexión.");
+  }finally{
+    $("loginButton").disabled = false;
   }
+};
 
-  currencies.forEach(currency=>{
-    rates[currency]=Number(document.getElementById('rate'+currency).value);
-  });
+window.logoutAdmin = async function(){
+  try{
+    await signOut(auth);
+    message("authMessage","Sesión cerrada.");
+    showTab("home");
+  }catch(error){
+    console.error(error);
+    alert("No se pudo cerrar la sesión. Inténtalo de nuevo.");
+  }
+};
 
-  document.getElementById('rateMessage').textContent=
-    'Tasas actualizadas en esta demostración. No se han guardado en el servidor.';
+onAuthStateChanged(auth,async user=>{
+  if(!user){
+    setAdminUI(null);
+    return;
+  }
+  try{
+    const adminSnap = await getDoc(doc(db,"admins",user.uid));
+    if(adminSnap.exists() && adminSnap.data().role === "admin"){
+      setAdminUI(user);
+      await loadSettings();
+    }else{
+      await signOut(auth);
+      setAdminUI(null);
+      message("authMessage","La cuenta no está autorizada como administradora.");
+    }
+  }catch(error){
+    console.error(error);
+    setAdminUI(null);
+    message("authMessage","No se pudo verificar el permiso. Revisa las reglas de Firestore.");
+  }
+});
 
-  calculateExchange();
+async function loadSettings(){
+  try{
+    const snap = await getDoc(doc(db,"settings","exchange"));
+    if(!snap.exists()){
+      message("rateMessage","Todavía no hay tasas guardadas. Puedes introducirlas y guardarlas.");
+      return;
+    }
+    const data = snap.data();
+    if(data.rates){
+      for(const currency of Object.keys(rates)){
+        const value = data.rates[currency];
+        rates[currency] = typeof value === "number" && value > 0 ? value : null;
+        $( "rate"+currency ).value = rates[currency] ?? "";
+      }
+    }
+    if(typeof data.commission === "number"){
+      commission = data.commission;
+      $("commission").value = commission;
+      $("commissionSummary").textContent = commission+"%";
+    }
+    if(typeof data.minLimit === "number"){
+      minLimit = data.minLimit;
+      $("minLimit").value = minLimit;
+    }
+    if(data.maxLimit === null || typeof data.maxLimit === "number"){
+      maxLimit = data.maxLimit;
+      $("maxLimit").value = maxLimit ?? "";
+    }
+    calculateExchange();
+    message("rateMessage","Configuración cargada desde Firebase.");
+  }catch(error){
+    console.error(error);
+    message("rateMessage","No se pudo cargar la configuración de Firebase.");
+  }
 }
 
-function saveCommission(){
-  const value=Number(document.getElementById('commission').value);
+async function saveSettings(partialData){
+  if(!isAdmin || !auth.currentUser) throw new Error("No hay una sesión de administrador.");
+  await setDoc(doc(db,"settings","exchange"),{
+    ...partialData,
+    updatedAt: new Date().toISOString(),
+    updatedBy: auth.currentUser.uid
+  },{merge:true});
+}
 
+window.saveRates = async function(){
+  const currencies = Object.keys(rates);
+  const newRates = {};
+  for(const currency of currencies){
+    const value = $("rate"+currency).value;
+    const number = Number(value);
+    if(value.trim()==="" || !Number.isFinite(number) || number<=0){
+      alert("Introduce una tasa válida y mayor que cero para "+currency+".");
+      return;
+    }
+    newRates[currency] = number;
+  }
+  try{
+    await saveSettings({rates:newRates});
+    Object.assign(rates,newRates);
+    message("rateMessage","Tasas guardadas correctamente en Firebase.");
+    calculateExchange();
+  }catch(error){
+    console.error(error);
+    message("rateMessage","No se pudieron guardar las tasas. Comprueba tu sesión y las reglas de Firestore.");
+  }
+};
+
+window.saveCommission = async function(){
+  const value = Number($("commission").value);
   if(!Number.isFinite(value)||value<0||value>100){
-    alert('La comisión debe estar entre 0 y 100%.');
+    alert("La comisión debe estar entre 0 y 100%.");
     return;
   }
+  try{
+    await saveSettings({commission:value});
+    commission = value;
+    $("commissionSummary").textContent = commission+"%";
+    message("commissionMessage","Comisión guardada en Firebase.");
+  }catch(error){
+    console.error(error);
+    message("commissionMessage","No se pudo guardar la comisión.");
+  }
+};
 
-  commission=value;
-  document.getElementById('commissionSummary').textContent=commission+'%';
-  document.getElementById('commissionMessage').textContent=
-    'Comisión actualizada en esta demostración.';
-}
-
-function saveLimits(){
-  const minValue=document.getElementById('minLimit').value;
-  const maxValue=document.getElementById('maxLimit').value;
-
-  const min=Number(minValue);
-  const max=maxValue===''?null:Number(maxValue);
-
-  if(minValue===''||!Number.isFinite(min)||min<0){
-    alert('Introduce un límite mínimo válido.');
+window.saveLimits = async function(){
+  const minValue = $("minLimit").value;
+  const maxValue = $("maxLimit").value;
+  const min = Number(minValue);
+  const max = maxValue==="" ? null : Number(maxValue);
+  if(minValue==="" || !Number.isFinite(min) || min<0){
+    alert("Introduce un límite mínimo válido.");
     return;
   }
-
-  if(max!==null&&(!Number.isFinite(max)||max<=0)){
-    alert('Introduce un límite máximo válido o déjalo vacío.');
+  if(max!==null && (!Number.isFinite(max)||max<=0)){
+    alert("Introduce un límite máximo válido o déjalo vacío.");
     return;
   }
-
-  if(max!==null&&max<min){
-    alert('El límite máximo no puede ser menor que el mínimo.');
+  if(max!==null && max<min){
+    alert("El límite máximo no puede ser menor que el mínimo.");
     return;
   }
+  try{
+    await saveSettings({minLimit:min,maxLimit:max});
+    minLimit = min;
+    maxLimit = max;
+    message("limitMessage","Límites guardados en Firebase.");
+  }catch(error){
+    console.error(error);
+    message("limitMessage","No se pudieron guardar los límites.");
+  }
+};
 
-  minLimit=min;
-  maxLimit=max;
+window.showTab = function(id,button){
+  if(id==="admin" && !isAdmin){
+    alert("Debes iniciar sesión como administrador.");
+    return;
+  }
+  document.querySelectorAll(".section").forEach(section=>section.classList.remove("show"));
+  $(id).classList.add("show");
+  document.querySelectorAll("nav button").forEach(btn=>btn.classList.remove("active"));
+  if(button) button.classList.add("active");
+  else{
+    const navButton = document.querySelector('nav button[data-tab="'+id+'"]');
+    if(navButton) navButton.classList.add("active");
+  }
+};
 
-  document.getElementById('limitMessage').textContent=
-    'Límites actualizados en esta demostración. Mínimo: '+minLimit+
-    ' RUSD. Máximo: '+(maxLimit===null?'sin configurar':maxLimit+' RUSD')+'.';
-}
+window.openSection = function(id){
+  if(id==="admin" && !isAdmin) return;
+  document.querySelectorAll(".section").forEach(section=>section.classList.remove("show"));
+  $(id).classList.add("show");
+  document.querySelectorAll("nav button").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.tab===id);
+  });
+};
 
-function demoMessage(){
-  alert('RUSDPAY: Esta función estará disponible cuando conectemos el backend seguro. Esta versión es solo una demostración.');
-}
+window.updateExchange = function(){
+  const direction = $("direction").value;
+  const currency = $("currency").value;
+  $("fromLabel").textContent = direction==="to" ? "Moneda que entregas" : "Moneda que recibirás";
+  $("resultCurrency").value = direction==="to" ? "RUSD" : currency;
+  calculateExchange();
+};
 
-updateExchange();
+window.calculateExchange = function(){
+  const direction = $("direction").value;
+  const currency = $("currency").value;
+  const amount = Number($("exchangeAmount").value);
+  const result = $("exchangeResult");
+  const info = $("exchangeRateInfo");
+  $("resultCurrency").value = direction==="to" ? "RUSD" : currency;
+
+  if(!Number.isFinite(amount)||amount<=0){
+    result.value="";
+    info.textContent="Introduce una cantidad para calcular el resultado estimado.";
+    return;
+  }
+  const rate = rates[currency];
+  if(rate===null || rate<=0){
+    result.value="";
+    info.textContent="No hay una tasa configurada para "+currency+".";
+    return;
+  }
+  const converted = direction==="to" ? amount/rate : amount*rate;
+  result.value = converted.toFixed(4);
+  info.textContent = "Tasa: 1 RUSD = "+rate+" "+currency+". Resultado estimado, sin ejecutar operaciones.";
+};
+
+window.demoMessage = function(){
+  alert("RUSDPAY: Esta función estará disponible cuando conectemos el backend seguro. Esta versión es solo una demostración.");
+};
+
+window.updateExchange();
 </script>
 </body>
 </html>
