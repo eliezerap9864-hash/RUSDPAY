@@ -623,28 +623,41 @@ $("backPhone").addEventListener("click", () => {
  showAccessOptions();
 });
 
+// CORRECCIÓN: LIMPIAR EL VERIFICADOR Y SU CONTENEDOR
 function clearRecaptcha() {
+
  if (recaptchaVerifier) {
   try {
    recaptchaVerifier.clear();
   } catch(error) {
    console.warn("Error limpiando reCAPTCHA:", error);
   }
+
   recaptchaVerifier = null;
+ }
+
+ const container = $("recaptcha-container");
+
+ if (container) {
+  container.innerHTML = "";
  }
 }
 
-// CORRECCIÓN: reCAPTCHA USA EL CONTENEDOR HTML
+// CORRECCIÓN: CREAR UNA SOLA INSTANCIA DE RECAPTCHA
 function createRecaptcha() {
+
  if (!recaptchaVerifier) {
+
   recaptchaVerifier = new RecaptchaVerifier(
    auth,
    "recaptcha-container",
    {
     size: "invisible",
+
     callback: () => {
      console.log("Verificación reCAPTCHA completada.");
     },
+
     "expired-callback": () => {
      message("La verificación expiró. Inténtalo otra vez.");
      clearRecaptcha();
@@ -652,6 +665,7 @@ function createRecaptcha() {
    }
   );
  }
+
  return recaptchaVerifier;
 }
 
@@ -663,6 +677,7 @@ $("telegramAccessBtn").addEventListener("click", () => {
   "_blank",
   "noopener,noreferrer"
  );
+
  message(
   "Abre @rusdpaybot en Telegram. La validación de identidad se conectará mediante un servidor seguro."
  );
@@ -670,6 +685,7 @@ $("telegramAccessBtn").addEventListener("click", () => {
 
 // ENVIAR CÓDIGO SMS
 $("sendSmsBtn").addEventListener("click", async () => {
+
  const phone = $("phoneNumber").value.trim();
 
  if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
@@ -684,9 +700,12 @@ $("sendSmsBtn").addEventListener("click", async () => {
  message("Preparando el envío del código...");
 
  try {
+
   const verifier = createRecaptcha();
 
-  await verifier.render();
+  // IMPORTANTE:
+  // NO LLAMAR A verifier.render() AQUÍ.
+  // signInWithPhoneNumber GESTIONA EL RECAPTCHA.
 
   confirmationResult = await signInWithPhoneNumber(
    auth,
@@ -700,11 +719,11 @@ $("sendSmsBtn").addEventListener("click", async () => {
   message("Código enviado. Revisa tus mensajes SMS.");
 
  } catch(error) {
+
   console.error("ERROR FIREBASE SMS:", error);
 
   clearRecaptcha();
 
-  // MOSTRAR EL ERROR EXACTO DE FIREBASE
   message(
    "Error Firebase: " +
    (error.code || "sin código") +
@@ -713,6 +732,7 @@ $("sendSmsBtn").addEventListener("click", async () => {
   );
 
  } finally {
+
   authFlowBusy = false;
   $("sendSmsBtn").disabled = false;
  }
@@ -720,6 +740,7 @@ $("sendSmsBtn").addEventListener("click", async () => {
 
 // VERIFICAR CÓDIGO SMS
 $("verifySmsBtn").addEventListener("click", async () => {
+
  const code = $("smsCode").value.trim();
 
  if (!confirmationResult) {
@@ -739,13 +760,16 @@ $("verifySmsBtn").addEventListener("click", async () => {
  message("Verificando código...");
 
  try {
+
   const result = await confirmationResult.confirm(code);
+
   confirmationResult = null;
   clearRecaptcha();
 
   await showAuthenticatedUser(result.user);
 
  } catch(error) {
+
   console.error("ERROR VERIFICANDO SMS:", error);
 
   message(
@@ -756,6 +780,7 @@ $("verifySmsBtn").addEventListener("click", async () => {
   );
 
  } finally {
+
   authFlowBusy = false;
   $("verifySmsBtn").disabled = false;
  }
@@ -763,16 +788,21 @@ $("verifySmsBtn").addEventListener("click", async () => {
 
 // VOLVER A SOLICITAR SMS
 $("resendSmsBtn").addEventListener("click", () => {
+
  confirmationResult = null;
  $("smsCode").value = "";
+
  $("codeStep").classList.add("hidden");
  $("phoneStep").classList.remove("hidden");
+
  clearRecaptcha();
+
  message("Puedes solicitar un nuevo código.");
 });
 
 // MOSTRAR APLICACIÓN Y COMPROBAR ADMINISTRADOR
 async function showAuthenticatedUser(user) {
+
  currentUser = user;
  isAdmin = false;
 
@@ -790,6 +820,7 @@ async function showAuthenticatedUser(user) {
  showSection("home");
 
  try {
+
   const adminSnap = await getDoc(
    doc(db,"admins",user.uid)
   );
@@ -805,6 +836,7 @@ async function showAuthenticatedUser(user) {
   }
 
  } catch(error) {
+
   console.error(error);
   $("adminNav").classList.add("hidden");
  }
@@ -812,6 +844,7 @@ async function showAuthenticatedUser(user) {
 
 // INICIAR SESIÓN POR CORREO
 $("loginForm").addEventListener("submit", async e => {
+
  e.preventDefault();
 
  if (authFlowBusy) return;
@@ -820,6 +853,7 @@ $("loginForm").addEventListener("submit", async e => {
  message("Comprobando tu cuenta...");
 
  try {
+
   const result = await signInWithEmailAndPassword(
    auth,
    $("email").value.trim(),
@@ -827,7 +861,9 @@ $("loginForm").addEventListener("submit", async e => {
   );
 
   if (!result.user.emailVerified) {
+
    try {
+
     await sendEmailVerification(result.user);
     await signOut(auth);
 
@@ -836,6 +872,7 @@ $("loginForm").addEventListener("submit", async e => {
     );
 
    } catch(error) {
+
     console.error(error);
     await signOut(auth);
 
@@ -848,10 +885,12 @@ $("loginForm").addEventListener("submit", async e => {
   await showAuthenticatedUser(result.user);
 
  } catch(error) {
+
   console.error(error);
   message("No se pudo iniciar sesión. Revisa tu correo y contraseña.");
 
  } finally {
+
   authFlowBusy = false;
  }
 });
@@ -873,6 +912,7 @@ $("registerBtn").addEventListener("click", async () => {
  message("Creando tu cuenta...");
 
  try {
+
   const result = await createUserWithEmailAndPassword(
    auth,
    email,
@@ -887,6 +927,7 @@ $("registerBtn").addEventListener("click", async () => {
   );
 
  } catch(error) {
+
   console.error(error);
 
   message(
@@ -894,15 +935,19 @@ $("registerBtn").addEventListener("click", async () => {
   );
 
  } finally {
+
   authFlowBusy = false;
  }
 });
 
 // CERRAR SESIÓN
 $("logoutBtn").addEventListener("click", async () => {
+
  await signOut(auth);
+
  currentUser = null;
  isAdmin = false;
+
  showAccessOptions();
  showLogin("Sesión cerrada correctamente.");
 });
@@ -913,8 +958,10 @@ onAuthStateChanged(auth, async user => {
  if (authFlowBusy) return;
 
  if (!user) {
+
   currentUser = null;
   isAdmin = false;
+
   showLogin();
   return;
  }
@@ -967,8 +1014,10 @@ window.calculate = function() {
  const to = $("toCurrency").value;
 
  if (!amount || amount <= 0) {
+
   $("calculationResult").textContent =
    "Introduce una cantidad válida.";
+
   return;
  }
 
@@ -982,6 +1031,7 @@ window.calculate = function() {
 async function loadSettings() {
 
  try {
+
   const snap = await getDoc(
    doc(db,"settings","exchange")
   );
@@ -1000,7 +1050,9 @@ async function loadSettings() {
   $("p2pMax").value = d.p2pMax ?? "";
 
  } catch(error) {
+
   console.error(error);
+
   $("adminMessage").textContent =
    "No se pudieron cargar los ajustes.";
  }
@@ -1010,8 +1062,10 @@ async function loadSettings() {
 async function saveSettings(fields) {
 
  if (!isAdmin || !currentUser) {
+
   $("adminMessage").textContent =
    "Acceso de administrador requerido.";
+
   return;
  }
 
@@ -1025,8 +1079,10 @@ async function saveSettings(fields) {
    value === "" ||
    !Number.isFinite(Number(value))
   ) {
+
    $("adminMessage").textContent =
     "Revisa los valores introducidos.";
+
    return;
   }
 
@@ -1045,6 +1101,7 @@ async function saveSettings(fields) {
    "Configuración guardada correctamente.";
 
  } catch(error) {
+
   console.error(error);
 
   $("adminMessage").textContent =
