@@ -133,7 +133,7 @@ hr{border:0;border-top:1px solid var(--border);margin:18px 0}
 button:disabled{opacity:.5;cursor:not-allowed}
 footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 
-/* ACCESO MODERNO */
+/* ACCESO */
 .access-option {
   width:100%;
   display:flex;
@@ -192,14 +192,7 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
   color:#69b9ff;
   font-size:23px;
 }
-.back-button {
-  background:transparent;
-  color:#69b9ff;
-  padding:8px 0;
-  margin-bottom:12px;
-}
 .form-title {margin:8px 0 18px}
-#recaptcha-container {margin:10px 0}
 @media(min-width:650px){
  .grid{grid-template-columns:repeat(4,1fr)}
  .container{padding:25px}
@@ -239,20 +232,6 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
         <span class="access-arrow">›</span>
       </button>
 
-      <button class="access-option" id="phoneAccessBtn">
-        <span class="access-icon">
-          <svg viewBox="0 0 24 24">
-            <rect x="6" y="2" width="12" height="20" rx="2"/>
-            <path d="M10 18h4"/>
-          </svg>
-        </span>
-        <span class="access-info">
-          <strong>Teléfono</strong>
-          <small>Recibe un código por SMS</small>
-        </span>
-        <span class="access-arrow">›</span>
-      </button>
-
       <button class="access-option" id="telegramAccessBtn">
         <span class="access-icon telegram">
           <svg viewBox="0 0 24 24">
@@ -270,7 +249,7 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
 
     <!-- ACCESO POR CORREO -->
     <div id="emailPanel" class="hidden">
-      <button class="back-button" id="backEmail">← Volver</button>
+      <button class="back-button secondary" id="backEmail">← Volver</button>
       <h3 class="form-title">Acceso con correo</h3>
 
       <form id="loginForm">
@@ -294,51 +273,12 @@ footer{text-align:center;padding:25px;color:var(--muted);font-size:12px}
       </button>
     </div>
 
-    <!-- ACCESO POR TELÉFONO -->
-    <div id="phonePanel" class="hidden">
-      <button class="back-button" id="backPhone">← Volver</button>
-      <h3 class="form-title">Acceso con teléfono</h3>
-
-      <div id="phoneStep">
-        <label>Número de teléfono con código de país</label>
-        <input id="phoneNumber" type="tel"
-          placeholder="+34600123456"
-          autocomplete="tel">
-
-        <div id="recaptcha-container"></div>
-
-        <button class="primary" style="width:100%" id="sendSmsBtn" type="button">
-          Enviar código SMS
-        </button>
-
-        <p class="muted" style="font-size:12px">
-          Escribe tu número con el prefijo internacional, por ejemplo +34.
-        </p>
-      </div>
-
-      <div id="codeStep" class="hidden">
-        <label>Código de verificación</label>
-        <input id="smsCode" type="text"
-          inputmode="numeric" autocomplete="one-time-code"
-          placeholder="Introduce el código SMS">
-
-        <button class="primary" style="width:100%" id="verifySmsBtn" type="button">
-          Verificar código
-        </button>
-
-        <button class="secondary" style="width:100%;margin-top:10px"
-          id="resendSmsBtn" type="button">
-          Volver a enviar código
-        </button>
-      </div>
-    </div>
-
     <p id="loginMessage" class="muted"></p>
   </div>
 
   <div class="notice">
-    Protegemos tu acceso mediante verificación de identidad.
-    El correo requiere verificación antes de iniciar sesión.
+    El acceso por correo requiere verificación mediante un enlace enviado a tu bandeja de entrada.
+    También puedes abrir nuestro bot de Telegram.
   </div>
 </div>
 
@@ -550,9 +490,7 @@ import {
  createUserWithEmailAndPassword,
  sendEmailVerification,
  onAuthStateChanged,
- signOut,
- RecaptchaVerifier,
- signInWithPhoneNumber
+ signOut
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 import {
@@ -580,8 +518,6 @@ const $ = id => document.getElementById(id);
 let isAdmin = false;
 let currentUser = null;
 let authFlowBusy = false;
-let recaptchaVerifier = null;
-let confirmationResult = null;
 
 function message(text) {
  $("loginMessage").textContent = text;
@@ -597,7 +533,6 @@ function showLogin(text = "") {
 function showAccessOptions() {
  $("accessOptions").classList.remove("hidden");
  $("emailPanel").classList.add("hidden");
- $("phonePanel").classList.add("hidden");
  message("");
 }
 
@@ -607,67 +542,7 @@ $("emailAccessBtn").addEventListener("click", () => {
  message("");
 });
 
-$("phoneAccessBtn").addEventListener("click", () => {
- $("accessOptions").classList.add("hidden");
- $("phonePanel").classList.remove("hidden");
- $("phoneStep").classList.remove("hidden");
- $("codeStep").classList.add("hidden");
- message("");
-});
-
 $("backEmail").addEventListener("click", showAccessOptions);
-
-$("backPhone").addEventListener("click", () => {
- clearRecaptcha();
- confirmationResult = null;
- showAccessOptions();
-});
-
-// CORRECCIÓN: LIMPIAR EL VERIFICADOR Y SU CONTENEDOR
-function clearRecaptcha() {
-
- if (recaptchaVerifier) {
-  try {
-   recaptchaVerifier.clear();
-  } catch(error) {
-   console.warn("Error limpiando reCAPTCHA:", error);
-  }
-
-  recaptchaVerifier = null;
- }
-
- const container = $("recaptcha-container");
-
- if (container) {
-  container.innerHTML = "";
- }
-}
-
-// CORRECCIÓN: CREAR UNA SOLA INSTANCIA DE RECAPTCHA
-function createRecaptcha() {
-
- if (!recaptchaVerifier) {
-
-  recaptchaVerifier = new RecaptchaVerifier(
-   auth,
-   "recaptcha-container",
-   {
-    size: "invisible",
-
-    callback: () => {
-     console.log("Verificación reCAPTCHA completada.");
-    },
-
-    "expired-callback": () => {
-     message("La verificación expiró. Inténtalo otra vez.");
-     clearRecaptcha();
-    }
-   }
-  );
- }
-
- return recaptchaVerifier;
-}
 
 // TELEGRAM: ABRE EL BOT.
 // LA AUTENTICACIÓN REAL REQUIERE VALIDACIÓN EN SERVIDOR.
@@ -683,123 +558,6 @@ $("telegramAccessBtn").addEventListener("click", () => {
  );
 });
 
-// ENVIAR CÓDIGO SMS
-$("sendSmsBtn").addEventListener("click", async () => {
-
- const phone = $("phoneNumber").value.trim();
-
- if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
-  message("Escribe el teléfono con prefijo internacional. Ejemplo: +34600123456");
-  return;
- }
-
- if (authFlowBusy) return;
-
- authFlowBusy = true;
- $("sendSmsBtn").disabled = true;
- message("Preparando el envío del código...");
-
- try {
-
-  const verifier = createRecaptcha();
-
-  // IMPORTANTE:
-  // NO LLAMAR A verifier.render() AQUÍ.
-  // signInWithPhoneNumber GESTIONA EL RECAPTCHA.
-
-  confirmationResult = await signInWithPhoneNumber(
-   auth,
-   phone,
-   verifier
-  );
-
-  $("phoneStep").classList.add("hidden");
-  $("codeStep").classList.remove("hidden");
-
-  message("Código enviado. Revisa tus mensajes SMS.");
-
- } catch(error) {
-
-  console.error("ERROR FIREBASE SMS:", error);
-
-  clearRecaptcha();
-
-  message(
-   "Error Firebase: " +
-   (error.code || "sin código") +
-   " — " +
-   (error.message || "No se pudo enviar el SMS.")
-  );
-
- } finally {
-
-  authFlowBusy = false;
-  $("sendSmsBtn").disabled = false;
- }
-});
-
-// VERIFICAR CÓDIGO SMS
-$("verifySmsBtn").addEventListener("click", async () => {
-
- const code = $("smsCode").value.trim();
-
- if (!confirmationResult) {
-  message("Primero solicita un código SMS.");
-  return;
- }
-
- if (!/^\d{6}$/.test(code)) {
-  message("Introduce el código de 6 dígitos.");
-  return;
- }
-
- if (authFlowBusy) return;
-
- authFlowBusy = true;
- $("verifySmsBtn").disabled = true;
- message("Verificando código...");
-
- try {
-
-  const result = await confirmationResult.confirm(code);
-
-  confirmationResult = null;
-  clearRecaptcha();
-
-  await showAuthenticatedUser(result.user);
-
- } catch(error) {
-
-  console.error("ERROR VERIFICANDO SMS:", error);
-
-  message(
-   "Error de verificación: " +
-   (error.code || "") +
-   " — " +
-   (error.message || "Código incorrecto o vencido.")
-  );
-
- } finally {
-
-  authFlowBusy = false;
-  $("verifySmsBtn").disabled = false;
- }
-});
-
-// VOLVER A SOLICITAR SMS
-$("resendSmsBtn").addEventListener("click", () => {
-
- confirmationResult = null;
- $("smsCode").value = "";
-
- $("codeStep").classList.add("hidden");
- $("phoneStep").classList.remove("hidden");
-
- clearRecaptcha();
-
- message("Puedes solicitar un nuevo código.");
-});
-
 // MOSTRAR APLICACIÓN Y COMPROBAR ADMINISTRADOR
 async function showAuthenticatedUser(user) {
 
@@ -809,13 +567,7 @@ async function showAuthenticatedUser(user) {
  $("loginScreen").classList.add("hidden");
  $("appScreen").classList.remove("hidden");
 
- const provider = user.providerData.map(p => p.providerId);
-
- if (provider.includes("phone")) {
-  $("userEmail").textContent = user.phoneNumber || "Usuario por teléfono";
- } else {
-  $("userEmail").textContent = user.email || "Usuario";
- }
+ $("userEmail").textContent = user.email || "Usuario";
 
  showSection("home");
 
@@ -969,7 +721,7 @@ onAuthStateChanged(auth, async user => {
  const provider = user.providerData.map(p => p.providerId);
  const usesEmailPassword = provider.includes("password");
 
- // EXIGIR VERIFICACIÓN SOLO A CUENTAS DE CORREO
+ // EXIGIR VERIFICACIÓN A CUENTAS DE CORREO
  if (usesEmailPassword && !user.emailVerified) {
 
   try {
